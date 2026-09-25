@@ -1,0 +1,3848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>烽火三国 · 原型 v3.3</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#1a1410;
+    font-family:"Microsoft YaHei","PingFang SC",sans-serif; color:#e8dcc8; }
+  #game { display:block; width:100%; height:100%; touch-action:none; }
+  #ui { position:absolute; left:0; top:0; width:100%; padding:10px;
+    pointer-events:none; display:flex; justify-content:space-between; }
+  .panel { background:rgba(30,22,16,.85); border:1px solid #6b5333;
+    border-radius:6px; padding:8px 12px; font-size:13px; line-height:1.6; }
+  #log { position:absolute; left:10px; bottom:90px; max-width:60%;
+    font-size:12px; color:#b8a888; line-height:1.5; pointer-events:none; }
+  #bottom { position:absolute; left:0; bottom:0; width:100%; padding:10px;
+    display:flex; gap:8px; justify-content:center; pointer-events:none; z-index:5; }
+  #campBtn {
+    position:absolute; left:10px; top:60px;
+    background:#3a2c1e; color:#ffdd55;
+    border:2px solid #c9a96a; border-radius:8px;
+    padding:10px 20px; font-size:14px; letter-spacing:2px;
+    pointer-events:auto; z-index:6; cursor:pointer;
+  }
+  #campBtn:hover { background:#5a4428; }
+  #enterCityBtn {
+    position:absolute; left:50%; bottom:80px; transform:translateX(-50%);
+    background:#3a2c1e; color:#ffdd55;
+    border:2px solid #c9a96a; border-radius:10px;
+    padding:12px 32px; font-size:16px; letter-spacing:3px;
+    pointer-events:auto; z-index:8; cursor:pointer;
+    box-shadow:0 4px 20px rgba(0,0,0,.6);
+    display:none;
+  }
+  #enterCityBtn:hover { background:#5a4428; }
+  #goldPanel {
+    background:rgba(30,22,16,.9); border:1px solid #c9a96a;
+    border-radius:6px; padding:6px 12px; font-size:14px;
+    color:#ffdd55; letter-spacing:1px;
+  }
+  button { pointer-events:auto; background:#3a2c1e; color:#e8dcc8;
+    border:1px solid #8a6a3a; border-radius:6px; padding:10px 18px;
+    font-size:14px; cursor:pointer; }
+  button:active { background:#5a4428; }
+  button:disabled { opacity:.4; cursor:default; }
+  #cmdMenu {
+    position:absolute; left:50%; bottom:60px; transform:translateX(-50%);
+    display:none; gap:10px; z-index:20;
+    background:rgba(20,14,8,.95); border:1px solid #8a6a3a;
+    border-radius:10px; padding:10px 14px;
+    box-shadow:0 4px 20px rgba(0,0,0,.6);
+    pointer-events:auto;
+  }
+  #cmdMenu button { min-width:88px; font-size:15px; padding:12px 18px; }
+  #cmdMenu button.atk { background:#5a2020; border-color:#c0392b; }
+  #cmdMenu button.wait { background:#204020; border-color:#4caf50; }
+  #cmdMenu button.cancel { background:#3a2c1e; }
+  #unitInfo {
+    position:absolute; display:none;
+    background:rgba(20,14,8,.92);
+    border:1px solid #8a6a3a; border-radius:8px; padding:10px 14px;
+    font-size:12px; line-height:1.7; z-index:9; min-width:200px;
+    right:10px; bottom:80px;
+    pointer-events:none;
+  }
+  #unitInfo .heroHead {
+    width:80px; height:80px; border-radius:50%;
+    border:2px solid #c9a96a; margin-bottom:6px; display:block;
+  }
+  #unitInfo .name { font-size:16px; margin-bottom:2px; }
+  #unitInfo .cls { font-size:11px; color:#c9a96a; margin-bottom:6px; }
+  #unitInfo .hp { color:#4caf50; }
+  #unitInfo .foe { color:#e74c3c; }
+  #unitInfo .lvl { color:#c9a96a; font-size:11px; }
+  #unitInfo .trait { color:#ffaa2a; font-size:11px; margin-top:4px;
+    border-top:1px dashed #6b5333; padding-top:4px; }
+  #unitInfo .traitName { color:#ffdd55; font-weight:bold; }
+  #phaseHint {
+    position:absolute; left:50%; top:60px; transform:translateX(-50%);
+    background:rgba(20,14,8,.9); border:1px solid #8a6a3a;
+    border-radius:20px; padding:6px 20px; font-size:13px;
+    color:#ffdd55; display:none; z-index:15; pointer-events:none;
+    text-align:center; max-width:90%;
+  }
+  #toast {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    background:rgba(20,14,8,.95); border:2px solid #8a6a3a;
+    border-radius:12px; padding:20px 40px; font-size:20px;
+    color:#ffdd55; display:none; z-index:30; pointer-events:none;
+    text-align:center; box-shadow:0 8px 40px rgba(0,0,0,.8);
+  }
+  #loading {
+    position:absolute; left:0; top:0; width:100%; height:100%;
+    background:#1a1410; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; z-index:100;
+  }
+  #loading .title { font-size:28px; color:#c9a96a; margin-bottom:24px;
+    letter-spacing:4px; }
+  #loading .bar { width:60%; max-width:400px; height:10px;
+    background:#3a2c1e; border-radius:5px; overflow:hidden; }
+  #loading .fill { height:100%; background:linear-gradient(90deg,#8a6a3a,#c9a96a);
+    width:0%; transition:width .15s; }
+  #loading .txt { margin-top:14px; font-size:13px; color:#b8a888; }
+  #birthScreen {
+    position:absolute; inset:0; background:rgba(10,6,4,.96);
+    display:none; flex-direction:column; align-items:center;
+    justify-content:center; z-index:200; padding:20px;
+  }
+  #birthScreen .title {
+    font-size:36px; color:#c9a96a; letter-spacing:8px;
+    margin-bottom:12px; text-shadow:0 4px 20px rgba(200,160,80,.4);
+  }
+  #birthScreen .subtitle {
+    font-size:14px; color:#8a7a5a; margin-bottom:24px; letter-spacing:2px;
+  }
+  #birthScreen .continueBtn {
+    padding:14px 60px; margin-bottom:24px; font-size:18px;
+    background:#2a5a2a; border:2px solid #4caf50; color:#fff;
+    letter-spacing:6px; border-radius:10px; cursor:pointer;
+  }
+  #birthScreen .continueBtn:hover { background:#3a7a3a; }
+  #birthScreen .divider {
+    font-size:13px; color:#8a7a5a; margin-bottom:20px;
+    letter-spacing:4px;
+  }
+  #birthGrid {
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:16px; max-width:900px; width:100%;
+  }
+  .birthCard {
+    background:linear-gradient(135deg, rgba(60,40,20,.9), rgba(30,20,10,.9));
+    border:2px solid #6b5333; border-radius:12px; padding:16px 12px;
+    text-align:center; cursor:pointer; transition:all .2s;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    min-height:160px;
+  }
+  .birthCard:hover {
+    border-color:#c9a96a;
+    background:linear-gradient(135deg, rgba(80,55,25,.95), rgba(40,28,14,.95));
+    transform:translateY(-3px);
+  }
+  .birthCard .faction {
+    font-size:20px; color:#ffdd55; font-weight:bold; letter-spacing:4px;
+  }
+  .birthCard .desc { font-size:12px; color:#b8a888; line-height:1.5; }
+  .birthCard .head {
+    width:72px; height:72px; border-radius:50%;
+    border:2px solid #8a6a3a; background:#2a1e10;
+  }
+  #heroPickScreen {
+    position:absolute; inset:0; background:rgba(10,6,4,.96);
+    display:none; flex-direction:column; z-index:205; padding:20px;
+  }
+  #heroPickScreen .pickHeader {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; border-bottom:2px solid #6b5333; margin-bottom:16px;
+  }
+  #heroPickScreen .pickTitle {
+    font-size:24px; color:#c9a96a; letter-spacing:6px;
+  }
+  #heroPickScreen .backBtn {
+    font-size:14px; padding:8px 20px;
+  }
+  #heroPickScreen .pickHint {
+    font-size:13px; color:#8a7a5a; margin-bottom:16px;
+    text-align:center; letter-spacing:2px;
+  }
+  #heroPickGrid {
+    flex:1; overflow:auto; padding:20px;
+    background:rgba(20,14,8,.5); border:1px solid #6b5333; border-radius:8px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:14px;
+    align-content:start;
+  }
+  .pickCard {
+    background:rgba(40,28,14,.9); border:2px solid #6b5333;
+    border-radius:10px; padding:12px; display:flex; gap:12px;
+    cursor:pointer; transition:all .2s;
+  }
+  .pickCard:hover {
+    border-color:#c9a96a;
+    background:rgba(60,42,22,.95);
+    transform:translateY(-2px);
+  }
+  .pickCard .head {
+    width:64px; height:64px; border-radius:50%;
+    border:2px solid #8a6a3a; flex-shrink:0;
+  }
+  .pickCard .info { flex:1; font-size:12px; line-height:1.6; }
+  .pickCard .name { font-size:15px; margin-bottom:2px; }
+  .pickCard .cls { color:#c9a96a; font-size:11px; margin-bottom:4px; }
+  .pickCard .stat { color:#b8a888; }
+  .pickCard .stat span { color:#e8dcc8; }
+  .pickCard .trait {
+    margin-top:4px; padding-top:4px;
+    border-top:1px dashed #6b5333;
+    color:#ffaa2a; font-size:11px;
+  }
+  .pickCard .traitName { color:#ffdd55; font-weight:bold; }
+  #welcomeScreen {
+    position:absolute; inset:0; background:rgba(10,6,4,.96);
+    display:none; flex-direction:column; align-items:center;
+    justify-content:center; z-index:210; padding:20px;
+  }
+  #welcomeScreen .label {
+    font-size:16px; color:#8a7a5a; letter-spacing:4px; margin-bottom:24px;
+  }
+  #welcomeScreen .head {
+    width:180px; height:180px; border-radius:50%;
+    border:4px solid #c9a96a; box-shadow:0 0 40px rgba(200,160,80,.5);
+  }
+  #welcomeScreen .name {
+    font-size:42px; letter-spacing:8px;
+    margin-top:20px; text-shadow:0 4px 20px rgba(255,220,120,.5);
+  }
+  #welcomeScreen .role {
+    font-size:16px; color:#c9a96a; margin-top:8px; letter-spacing:2px;
+  }
+  #welcomeScreen .traitInfo {
+    font-size:14px; color:#ffaa2a; margin-top:12px; letter-spacing:1px;
+    text-align:center; max-width:80%;
+  }
+  #welcomeScreen .enterBtn {
+    margin-top:36px; padding:14px 48px; font-size:16px;
+    background:#3a2c1e; border:2px solid #c9a96a; color:#ffdd55;
+    letter-spacing:4px;
+  }
+  #welcomeScreen .enterBtn:hover { background:#5a4428; }
+  #campScreen {
+    position:absolute; inset:0; background:rgba(10,6,4,.96);
+    display:none; flex-direction:column; z-index:220; padding:20px;
+  }
+  #campScreen .campHeader {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; border-bottom:2px solid #6b5333; margin-bottom:16px;
+  }
+  #campScreen .campTitle { font-size:26px; color:#c9a96a; letter-spacing:6px; }
+  #campScreen .closeBtn { font-size:14px; padding:8px 20px; }
+  .campTabs { display:flex; gap:12px; padding:0 20px; margin-bottom:16px; }
+  .campTab {
+    padding:10px 28px; border:1px solid #6b5333; border-radius:8px 8px 0 0;
+    background:rgba(30,20,10,.7); color:#b8a888; cursor:pointer;
+    font-size:15px; letter-spacing:2px;
+  }
+  .campTab.active {
+    background:rgba(60,40,20,.95); color:#ffdd55;
+    border-color:#c9a96a; border-bottom-color:transparent;
+  }
+  .campPanel {
+    flex:1; overflow:auto; padding:20px;
+    background:rgba(20,14,8,.5); border:1px solid #6b5333; border-radius:8px;
+  }
+  .heroGrid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:14px;
+  }
+  .heroCard {
+    background:rgba(40,28,14,.9); border:2px solid #6b5333;
+    border-radius:10px; padding:12px; display:flex; gap:12px;
+  }
+  .heroCard.dead {
+    opacity: .5;
+    filter: grayscale(0.8);
+    border-color: #666 !important;
+  }
+  .heroCard .head {
+    width:64px; height:64px; border-radius:50%;
+    border:2px solid #8a6a3a; flex-shrink:0;
+  }
+  .heroCard .info { flex:1; font-size:12px; line-height:1.6; }
+  .heroCard .name { font-size:15px; margin-bottom:2px; }
+  .heroCard .cls { color:#c9a96a; font-size:11px; margin-bottom:4px; }
+  .heroCard .stat { color:#b8a888; }
+  .heroCard .stat span { color:#e8dcc8; }
+  .heroCard .traitBox {
+    margin-top:6px; padding-top:6px;
+    border-top:1px dashed #6b5333;
+    color:#ffaa2a; font-size:11px; line-height:1.4;
+  }
+  .heroCard .traitName { color:#ffdd55; font-weight:bold; }
+  .heroCard .deadTag {
+    display:inline-block; background:#5a2020; color:#ff8080;
+    padding:2px 8px; border-radius:4px; font-size:11px;
+    letter-spacing:1px;
+  }
+  .capCard {
+    background:rgba(60,20,20,.7); border:1px solid #8a3a3a;
+    border-radius:10px; padding:12px; display:flex; gap:12px;
+    align-items:center;
+  }
+  .capCard .head {
+    width:64px; height:64px; border-radius:50%;
+    border:2px solid #c9a96a;
+  }
+  .capCard .info { flex:1; font-size:12px; line-height:1.6; }
+  .capCard .name { font-size:15px; color:#ffdd55; }
+  .capCard .btns { display:flex; flex-direction:column; gap:6px; }
+  .capCard button { padding:6px 16px; font-size:12px; }
+  .formationWrap { display:flex; gap:24px; padding:20px; }
+  .formationLeft { flex:1; }
+  .formationRight { flex:1; }
+  .formationTitle {
+    font-size:14px; color:#c9a96a; letter-spacing:2px;
+    margin-bottom:12px;
+  }
+  .grid9 {
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    grid-template-rows:repeat(3, 1fr);
+    gap:6px; width:100%; max-width:360px;
+    background:rgba(20,14,8,.8); padding:10px; border-radius:10px;
+    border:2px solid #6b5333;
+  }
+  .grid9 .cell {
+    aspect-ratio:1;
+    background:rgba(40,28,14,.6); border:1px dashed #6b5333;
+    border-radius:8px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    cursor:pointer; transition:all .2s;
+    position:relative; overflow:hidden;
+  }
+  .grid9 .cell.filled {
+    border:2px solid #c9a96a; border-style:solid;
+    background:rgba(60,42,22,.9);
+  }
+  .grid9 .cell.dragOver {
+    border-color:#ffdd55; background:rgba(90,65,30,.9);
+  }
+  .grid9 .cell img {
+    width:70%; height:70%; border-radius:50%;
+    object-fit:cover;
+  }
+  .grid9 .cell .posLabel {
+    position:absolute; top:2px; left:4px;
+    font-size:10px; color:#8a7a5a;
+  }
+  .grid9 .cell .cellName {
+    font-size:10px; color:#e8dcc8; margin-top:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:90%;
+  }
+  .benchList {
+    display:flex; flex-direction:column; gap:8px;
+    max-height:440px; overflow-y:auto;
+  }
+  .benchHero {
+    display:flex; gap:10px; align-items:center;
+    background:rgba(40,28,14,.9); border:1px solid #6b5333;
+    border-radius:8px; padding:8px 10px;
+    cursor:grab; transition:all .2s;
+    user-select:none;
+  }
+  .benchHero:hover { border-color:#c9a96a; }
+  .benchHero.dragging { opacity:.5; }
+  .benchHero.dead { opacity:.4; cursor:not-allowed; }
+  .benchHero img {
+    width:40px; height:40px; border-radius:50%;
+    border:2px solid #8a6a3a;
+  }
+  .benchHero .info { flex:1; font-size:12px; }
+  .benchHero .name { font-size:14px; }
+  .benchHero .cls { color:#c9a96a; font-size:11px; }
+  .benchHero.inGrid { opacity:.35; }
+.benchHero.selected {
+  border-color: #ffdd55 !important;
+  background: rgba(90,65,30,.95) !important;
+  box-shadow: 0 0 12px rgba(255,221,85,.5);
+}
+  .formationHint {
+    font-size:12px; color:#8a7a5a; margin-top:12px;
+    line-height:1.6;
+  }
+  .saveBtn {
+    margin-top:14px; padding:10px 28px; font-size:14px;
+    background:#2a5a2a; border:2px solid #4caf50; color:#fff;
+    letter-spacing:2px;
+  }
+  .saveBtn:hover { background:#3a7a3a; }
+  .savePanel { max-width:600px; margin:0 auto; padding:20px; }
+  .saveInfo {
+    background:rgba(40,28,14,.9); border:1px solid #6b5333;
+    border-radius:10px; padding:20px; margin-bottom:20px;
+    line-height:2; font-size:14px;
+  }
+  .saveInfo .label { color:#c9a96a; }
+  .saveInfo .value { color:#e8dcc8; }
+  .saveInfo .empty { color:#8a7a5a; text-align:center; padding:20px 0; }
+  .saveActions { display:flex; gap:16px; justify-content:center; }
+  .saveActions button { padding:14px 40px; font-size:15px; letter-spacing:2px; }
+  .saveActions .saveAction {
+    background:#2a5a2a; border-color:#4caf50; color:#fff;
+  }
+  .saveActions .saveAction:hover { background:#3a7a3a; }
+  .saveActions .loadAction {
+    background:#2a4a6a; border-color:#4a8ac0; color:#fff;
+  }
+  .saveActions .loadAction:hover { background:#3a5a7a; }
+  /* ===== 战后结算界面 ===== */
+  #resultScreen {
+    position:absolute; inset:0; background:rgba(5,3,2,.85);
+    display:none; align-items:center; justify-content:center;
+    z-index:230;
+  }
+  .resultBox {
+    background:linear-gradient(135deg, rgba(60,40,20,.98), rgba(30,20,10,.98));
+    border:3px solid #c9a96a; border-radius:16px;
+    padding:32px 48px; min-width:420px; max-width:80%;
+    box-shadow:0 8px 60px rgba(0,0,0,.9);
+    text-align:center;
+  }
+  .resultBox .resultTitle {
+    font-size:32px; letter-spacing:8px; margin-bottom:20px;
+    text-shadow:0 4px 20px rgba(255,220,120,.4);
+  }
+  .resultBox .resultTitle.win { color:#ffdd55; }
+  .resultBox .resultTitle.lose { color:#ff6666; }
+  .resultBox .resultTitle.retreat { color:#c9a96a; }
+  .resultBox .resultRow {
+    font-size:15px; color:#e8dcc8; line-height:2;
+    text-align:left; padding:12px 0;
+    border-top:1px dashed #6b5333;
+  }
+  .resultBox .resultRow:first-of-type { border-top:none; }
+  .resultBox .resultLabel { color:#c9a96a; }
+  .resultBox .resultGold { color:#ffdd55; font-weight:bold; }
+  .resultBox .levelUp { color:#4caf50; }
+  .resultBox .deadHero { color:#ff8080; }
+  .resultBox .okBtn {
+    margin-top:24px; padding:12px 60px; font-size:16px;
+    background:#2a5a2a; border:2px solid #4caf50; color:#fff;
+    letter-spacing:4px; border-radius:8px;
+  }
+  .resultBox .okBtn:hover { background:#3a7a3a; }
+  /* ===== 城池界面 ===== */
+  #cityScreen {
+    position:absolute; inset:0; background:rgba(10,6,4,.96);
+    display:none; flex-direction:column; z-index:225; padding:20px;
+  }
+  #cityScreen .cityHeader {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; border-bottom:2px solid #6b5333; margin-bottom:16px;
+  }
+  #cityScreen .cityTitle { font-size:26px; color:#c9a96a; letter-spacing:6px; }
+  #cityScreen .citySubtitle { font-size:13px; color:#8a7a5a; margin-left:12px; }
+  #cityScreen .leaveBtn { font-size:14px; padding:8px 20px; }
+  .cityMenu {
+    display:flex; gap:20px; justify-content:center; padding:40px 20px;
+  }
+  .cityMenuBtn {
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    background:rgba(40,28,14,.9); border:2px solid #6b5333;
+    border-radius:14px; padding:24px 32px; cursor:pointer;
+    transition:all .2s; min-width:160px;
+  }
+  .cityMenuBtn:hover {
+    border-color:#c9a96a; background:rgba(60,42,22,.95);
+    transform:translateY(-3px);
+  }
+  .cityMenuBtn .icon { font-size:40px; }
+  .cityMenuBtn .label { font-size:18px; color:#ffdd55; letter-spacing:4px; }
+  .cityMenuBtn .sub { font-size:11px; color:#8a7a5a; }
+  .cityPanel {
+    flex:1; overflow:auto; padding:20px;
+    background:rgba(20,14,8,.5); border:1px solid #6b5333; border-radius:8px;
+    display:none;
+  }
+  .cityPanel.active { display:block; }
+  .cityPanelHeader {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px; padding-bottom:8px;
+    border-bottom:1px solid #6b5333;
+  }
+  .cityPanelTitle { font-size:18px; color:#c9a96a; letter-spacing:4px; }
+  .cityPanelBack {
+    padding:6px 16px; font-size:13px;
+  }
+  .shopGrid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:14px;
+  }
+  .shopCard {
+    background:rgba(40,28,14,.9); border:2px solid #6b5333;
+    border-radius:10px; padding:12px; display:flex; gap:12px;
+  }
+  .shopCard .head {
+    width:56px; height:56px; border-radius:50%;
+    border:2px solid #8a6a3a; flex-shrink:0;
+  }
+  .shopCard .info { flex:1; font-size:12px; line-height:1.5; }
+  .shopCard .name { font-size:14px; margin-bottom:2px; }
+  .shopCard .cls { color:#c9a96a; font-size:11px; margin-bottom:3px; }
+  .shopCard .stat { color:#b8a888; font-size:11px; }
+  .shopCard .stat span { color:#e8dcc8; }
+  .shopCard .price {
+    color:#ffdd55; font-size:14px; font-weight:bold;
+    margin-top:6px;
+  }
+  .shopCard .buyBtn {
+    margin-top:6px; padding:6px 14px; font-size:12px;
+    background:#2a5a2a; border-color:#4caf50; color:#fff;
+  }
+  .shopCard .buyBtn:disabled {
+    background:#3a2c1e; border-color:#6b5333; color:#666;
+  }
+  .shopCard .soldTag {
+    color:#8a7a5a; font-size:13px; margin-top:8px;
+    letter-spacing:2px;
+  }
+  .shopCard .traitBox {
+    margin-top:4px; color:#ffaa2a; font-size:10px;
+  }
+  .refreshBar {
+    display:flex; justify-content:center; align-items:center;
+    gap:16px; margin-top:20px; padding-top:16px;
+    border-top:1px dashed #6b5333;
+  }
+  .emptyShop {
+    text-align:center; padding:80px 20px;
+    color:#8a7a5a; font-size:16px; letter-spacing:2px;
+    line-height:2;
+  }
+  @media (max-width: 700px) {
+  #birthGrid { grid-template-columns:repeat(2, 1fr); }
+  #birthScreen .title { font-size:24px; letter-spacing:4px; }
+  .formationWrap { flex-direction:column; }
+  #heroPickGrid { grid-template-columns:1fr; }
+  #ui .panel { font-size:11px; padding:5px 8px; }
+  #campBtn { padding:8px 14px; font-size:12px; top:50px; }
+  #goldPanel { font-size:12px; padding:4px 8px; }
+  #enterCityBtn { font-size:14px; padding:10px 20px; bottom:70px; }
+  button { padding:10px 14px; font-size:13px; }
+  .campTab { padding:8px 14px; font-size:12px; }
+  .heroGrid { grid-template-columns:1fr; }
+  .cityMenu { flex-direction:column; align-items:center; gap:12px; padding:20px 10px; }
+  .cityMenuBtn { min-width:200px; padding:16px 20px; }
+  .cityMenuBtn .icon { font-size:28px; }
+  .cityMenuBtn .label { font-size:16px; letter-spacing:2px; }
+  .resultBox { padding:20px 16px; min-width:auto; max-width:95%; }
+  .resultBox .resultTitle { font-size:22px; letter-spacing:4px; }
+  .resultBox .resultRow { font-size:13px; }
+  .saveActions { flex-direction:column; }
+  .saveActions button { width:100%; }
+  .shopGrid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="ui">
+  <div class="panel" id="infoLeft">大地图</div>
+  <div class="panel" id="goldPanel" style="position:absolute;left:50%;transform:translateX(-50%);top:10px;border-color:#c9a96a;color:#ffdd55;">💰 <span id="goldAmount">100</span></div>
+  <div class="panel" id="infoRight">日：1</div>
+</div>
+
+<div id="phaseHint"></div>
+<div id="log"></div>
+<div id="cmdMenu"></div>
+<div id="unitInfo"></div>
+<div id="toast"></div>
+
+<button id="campBtn" style="display:none">⚔ 营 地</button>
+<button id="enterCityBtn">进 入 城 池</button>
+
+<div id="bottom">
+  <button id="btnEndTurn" style="display:none">结束回合</button>
+  <button id="btnBack" style="display:none">撤退</button>
+</div>
+
+<div id="loading">
+  <div class="title">烽 火 三 国</div>
+  <div class="bar"><div class="fill" id="loadFill"></div></div>
+  <div class="txt" id="loadTxt">加载素材中…</div>
+</div>
+
+<div id="birthScreen">
+  <div class="title">选 择 出 生</div>
+  <div class="subtitle">不同出身，决定你的初始武将与命运</div>
+  <button class="continueBtn" id="continueBtn" style="display:none">继 续 游 戏</button>
+  <div class="divider" id="birthDivider" style="display:none">—— 或 者 选 择 新 的 出 生 ——</div>
+  <div id="birthGrid"></div>
+</div>
+
+<div id="heroPickScreen">
+  <div class="pickHeader">
+    <div class="pickTitle" id="pickTitle">选择主将</div>
+    <button class="backBtn" id="pickBack">返 回</button>
+  </div>
+  <div class="pickHint">点击武将卡，选择他作为你的初始主将</div>
+  <div id="heroPickGrid"></div>
+</div>
+
+<div id="welcomeScreen">
+  <div class="label">你 的 初 始 武 将</div>
+  <img class="head" id="welcomeHead" src="">
+  <div class="name" id="welcomeName">—</div>
+  <div class="role" id="welcomeRole">—</div>
+  <div class="traitInfo" id="welcomeTrait">—</div>
+  <button class="enterBtn" id="welcomeEnter">进 入 三 国</button>
+</div>
+
+<div id="campScreen">
+  <div class="campHeader">
+    <div class="campTitle">营 地</div>
+    <button class="closeBtn" id="campClose">关 闭</button>
+  </div>
+  <div class="campTabs">
+    <div class="campTab active" data-tab="heroes">武 将</div>
+    <div class="campTab" data-tab="captives">俘 虏</div>
+    <div class="campTab" data-tab="formation">布 阵</div>
+    <div class="campTab" data-tab="inventory">包 裹</div>
+    <div class="campTab" data-tab="save">存 档</div>
+  </div>
+  <div class="campPanel" id="campPanel"></div>
+</div>
+
+<!-- 战后结算 -->
+<div id="resultScreen">
+  <div class="resultBox">
+    <div class="resultTitle win" id="resultTitle">战 斗 胜 利</div>
+    <div id="resultContent"></div>
+    <button class="okBtn" id="resultOk">确 定</button>
+  </div>
+</div>
+
+<!-- 城池界面 -->
+<div id="cityScreen">
+  <div class="cityHeader">
+    <div>
+      <span class="cityTitle" id="cityName">洛阳</span>
+      <span class="citySubtitle" id="cityFaction">魏</span>
+    </div>
+    <button class="leaveBtn" id="cityLeave">离 开</button>
+  </div>
+  <div class="cityMenu" id="cityMenu">
+    <div class="cityMenuBtn" data-city="tavern">
+      <div class="icon">🍺</div>
+      <div class="label">酒 馆</div>
+      <div class="sub">招募武将</div>
+    </div>
+    <div class="cityMenuBtn" data-city="hospital">
+      <div class="icon">⚕</div>
+      <div class="label">医 馆</div>
+      <div class="sub">治疗 / 复活</div>
+    </div>
+    <div class="cityMenuBtn" data-city="shop">
+      <div class="icon">🛒</div>
+      <div class="label">商 店</div>
+      <div class="sub">买卖装备</div>
+    </div>
+  </div>
+  <div class="cityPanel" id="cityPanel">
+    <div class="cityPanelHeader">
+      <div class="cityPanelTitle" id="cityPanelTitle">酒 馆</div>
+      <button class="cityPanelBack" id="cityPanelBack">返 回</button>
+    </div>
+    <div id="cityPanelContent"></div>
+  </div>
+</div>
+
+<script src="assets.js"></script>
+<script src="heroes.js"></script>
+
+<script>
+/* =========================================================
+   烽火三国 · 原型 v3.3
+   - 金钱系统 + 战后结算
+   - 阵亡机制
+   - 城池系统（酒馆、医馆、商店）
+   ========================================================= */
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const cmdMenu = document.getElementById('cmdMenu');
+const unitInfo = document.getElementById('unitInfo');
+const phaseHint = document.getElementById('phaseHint');
+const toast = document.getElementById('toast');
+let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+/* 战斗格子大小（动态） */
+const BCOLS = 12, BROWS = 10;
+let TILE = 48;
+function recalcTile() {
+  const availW = W - 20;
+  const availH = H - 180;
+  const tileByW = Math.floor(availW / BCOLS);
+  const tileByH = Math.floor(availH / BROWS);
+  TILE = Math.max(22, Math.min(48, tileByW, tileByH));
+}
+
+function resize() {
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  recalcTile();
+}
+window.addEventListener('resize', resize); resize();
+
+/* ======================== 素材加载 ======================== */
+
+const UNIT_CLASSES = ['刀盾', '剑客', '女官', '弓兵', '枪兵', '步兵', '舞姬', '谋士', '骑兵'];
+const CITY_FILES = ['大城', '中城', '小城'];
+const IMG = {};
+const IMG_HEAD = {};
+
+function removeWhiteBgFromImage(img) {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const g = c.getContext('2d');
+  g.drawImage(img, 0, 0);
+  const w = c.width, h = c.height;
+  let data;
+  try { data = g.getImageData(0, 0, w, h); } catch (e) { return c; }
+  const d = data.data;
+  function isWhite(i) {
+    return d[i] >= 245 && d[i+1] >= 245 && d[i+2] >= 245;
+  }
+  const visited = new Uint8Array(w * h);
+  const queue = [];
+  function tryPush(x, y) {
+    if (x < 0 || x >= w || y < 0 || y >= h) return;
+    const idx = y * w + x;
+    if (visited[idx] || !isWhite(idx * 4)) return;
+    visited[idx] = 1; queue.push(idx);
+  }
+  for (let x = 0; x < w; x++) { tryPush(x, 0); tryPush(x, h-1); }
+  for (let y = 0; y < h; y++) { tryPush(0, y); tryPush(w-1, y); }
+  let head = 0;
+  while (head < queue.length) {
+    const idx = queue[head++];
+    const x = idx % w, y = (idx / w) | 0;
+    tryPush(x-1, y); tryPush(x+1, y); tryPush(x, y-1); tryPush(x, y+1);
+  }
+  for (let i = 0; i < visited.length; i++) {
+    if (visited[i]) d[i * 4 + 3] = 0;
+  }
+  const wmX = Math.floor(w * 0.72);
+  const wmY = Math.floor(h * 0.86);
+  for (let y = wmY; y < h; y++) {
+    for (let x = wmX; x < w; x++) {
+      d[(y * w + x) * 4 + 3] = 0;
+    }
+  }
+  g.putImageData(data, 0, 0);
+  return c;
+}
+
+function cropUpperBody(srcCanvas) {
+  const sw = srcCanvas.width, sh = srcCanvas.height;
+  const sx = sw * 0.18, sy = 0;
+  const cw = sw * 0.64, ch = sh * 0.62;
+  const c = document.createElement('canvas');
+  c.width = Math.round(cw); c.height = Math.round(ch);
+  const g = c.getContext('2d');
+  g.drawImage(srcCanvas, sx, sy, cw, ch, 0, 0, c.width, c.height);
+  return c;
+}
+
+function loadImageFromB64(b64) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = b64;
+  });
+}
+
+async function loadAllAssets() {
+  const fill = document.getElementById('loadFill');
+  const txt = document.getElementById('loadTxt');
+  const keys = [];
+  for (const cls of UNIT_CLASSES) {
+    for (const team of ['A', 'B']) keys.push(cls + '_' + team);
+  }
+  for (const c of CITY_FILES) keys.push(c);
+  const total = keys.length;
+  let done = 0;
+  function tick() {
+    done++;
+    fill.style.width = (done / total * 100) + '%';
+    txt.textContent = `加载素材中… ${done}/${total}`;
+  }
+  for (const key of keys) {
+    const b64 = ASSETS_B64[key];
+    if (!b64) { tick(); continue; }
+    if (CITY_FILES.includes(key)) {
+      const img = await loadImageFromB64(b64);
+      if (img) IMG[key] = removeWhiteBgFromImage(img);
+    } else {
+      const img = await loadImageFromB64(b64);
+      if (img) {
+        const cleaned = removeWhiteBgFromImage(img);
+        IMG[key] = cleaned;
+        IMG_HEAD[key] = cropUpperBody(cleaned);
+      }
+    }
+    tick();
+  }
+  document.getElementById('loading').style.display = 'none';
+}
+
+function getUnitImage(cls, team) { return IMG[cls + '_' + team] || null; }
+function getUnitHead(cls, team) { return IMG_HEAD[cls + '_' + team] || null; }
+
+function makeFallbackSprite(cls, team, size = 96) {
+  const c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  const g = c.getContext('2d');
+  const cx = size/2, cy = size/2;
+  const color = team === 'A' ? '#2e86de' : '#c0392b';
+  g.fillStyle = 'rgba(0,0,0,.3)';
+  g.beginPath(); g.ellipse(cx, size-10, size*0.3, size*0.08, 0, 0, 7); g.fill();
+  g.fillStyle = color;
+  g.beginPath(); g.arc(cx, cy, size*0.3, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.font = 'bold 14px sans-serif'; g.textAlign = 'center';
+  g.fillText(cls, cx, cy + 5);
+  return c;
+}
+const fallbackCache = {};
+function getFallbackSprite(cls, team) {
+  const key = cls + '_' + team;
+  if (!fallbackCache[key]) fallbackCache[key] = makeFallbackSprite(cls, team);
+  return fallbackCache[key];
+}
+function drawUnitSprite(g, cls, team, x, y, size, useHead) {
+  let img = null;
+  if (useHead) img = getUnitHead(cls, team);
+  if (!img) img = getUnitImage(cls, team);
+  if (img) g.drawImage(img, x, y, size, size);
+  else g.drawImage(getFallbackSprite(cls, team), x, y, size, size);
+}
+
+const _imgCache = {};
+function getCachedImage(src) {
+  if (!src) return null;
+  if (!_imgCache[src]) {
+    _imgCache[src] = new Image();
+    _imgCache[src].src = src;
+  }
+  return _imgCache[src];
+}
+function drawPlayerAvatar(cx, cy, radius, b64) {
+  if (!b64) return false;
+  const imgEl = getCachedImage(b64);
+  if (!imgEl || !imgEl.complete) return false;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, 7);
+  ctx.clip();
+  ctx.drawImage(imgEl, cx - radius, cy - radius, radius * 2, radius * 2);
+  ctx.restore();
+  return true;
+}
+
+/* ======================== 品级系统 ======================== */
+
+const RANK_GROWTH = {
+  '凡将': { atk: 0.4, def: 0.4, hp: 3,   spd: 0.15 },
+  '良将': { atk: 0.6, def: 0.6, hp: 5,   spd: 0.25 },
+  '名将': { atk: 0.8, def: 0.8, hp: 7,   spd: 0.35 },
+  '上将': { atk: 1.0, def: 1.0, hp: 9,   spd: 0.45 },
+  '神将': { atk: 1.2, def: 1.1, hp: 11,  spd: 0.55 },
+};
+const RANK_INIT_MULT = {
+  '凡将': 1.0, '良将': 1.1, '名将': 1.25, '上将': 1.5, '神将': 2.0,
+};
+const RANK_COLOR = {
+  '凡将': '#aaa', '良将': '#4caf50', '名将': '#4a9be8', '上将': '#a05ad0', '神将': '#ffaa2a',
+};
+const RANK_THRESHOLDS = [
+  { rank: '凡将', min: 0,  max: 26 },
+  { rank: '良将', min: 27, max: 38 },
+  { rank: '名将', min: 39, max: 50 },
+  { rank: '上将', min: 51, max: 62 },
+  { rank: '神将', min: 63, max: 9999 },
+];
+const RANK_RECRUIT_PRICE = {
+  '凡将': 50, '良将': 150, '名将': 400, '上将': 1200, '神将': 5000,
+};
+const RANK_REVIVE_PRICE = {
+  '凡将': 100, '良将': 200, '名将': 400, '上将': 800, '神将': 1500,
+};
+function calcGrowthScore(g) {
+  return g.atk * 15 + g.def * 15 + g.hp * 1.5 + g.spd * 30;
+}
+function rankFromGrowth(g) {
+  const score = calcGrowthScore(g);
+  for (const t of RANK_THRESHOLDS) {
+    if (score >= t.min && score <= t.max) return t.rank;
+  }
+  return '凡将';
+}
+
+/* ======================== 兵种数据 ======================== */
+
+const CLASS_STATS = {
+  '骑兵': { atk: 28, def: 8, mov: 5, spd: 12, range: 1 },
+  '步兵': { atk: 22, def: 12, mov: 4, spd: 10, range: 1 },
+  '弓兵': { atk: 24, def: 4, mov: 3, spd: 14, range: 3 },
+  '枪兵': { atk: 24, def: 9, mov: 4, spd: 11, range: 1 },
+  '剑客': { atk: 26, def: 7, mov: 4, spd: 13, range: 1 },
+  '刀盾': { atk: 20, def: 14, mov: 4, spd: 9, range: 1 },
+  '谋士': { atk: 20, def: 5, mov: 4, spd: 11, range: 2 },
+  '女官': { atk: 18, def: 6, mov: 4, spd: 12, range: 2 },
+  '舞姬': { atk: 16, def: 4, mov: 5, spd: 15, range: 2 },
+};
+const ALL_CLASSES = Object.keys(CLASS_STATS);
+
+const COUNTER_TABLE = {
+  '骑兵': { '弓兵': 1.5, '步兵': 0.7 },
+  '弓兵': { '步兵': 1.5, '骑兵': 0.7 },
+  '步兵': { '骑兵': 1.5, '弓兵': 0.7 },
+  '枪兵': {}, '剑客': {}, '刀盾': {},
+  '谋士': {}, '女官': {}, '舞姬': {},
+};
+function getCounterMultiplier(a, b) {
+  const row = COUNTER_TABLE[a];
+  if (!row) return 1.0;
+  return row[b] || 1.0;
+}
+function calcDodgeRate(defender, attacker) {
+  const diff = defender.spd - attacker.spd;
+  if (diff <= 0) return 0;
+  return Math.min(0.30, diff * 0.03);
+}
+function expNeeded(level) { return level; }
+function maxLevel() { return 10; }
+
+/* ======================== 特性系统 ======================== */
+
+const TRAITS = {
+  '无双': { id:'无双', name:'无双', rank:'神将', desc:'攻击时对目标相邻的敌人造成 50% 溅射伤害', onAttackSplash: true },
+  '武圣': { id:'武圣', name:'武圣', rank:'神将', desc:'攻击无视 30% 防御', ignoreDefRatio: 0.30 },
+  '万人敌': { id:'万人敌', name:'万人敌', rank:'神将', desc:'受到伤害 -20%，但速度 -3', takeDamageMult: 0.80, statMod: { spd: -3 } },
+  '常胜': { id:'常胜', name:'常胜', rank:'神将', desc:'闪避率 +15%，反击必中', dodgeBonus: 0.15, counterAlwaysHit: true },
+  '卧龙': { id:'卧龙', name:'卧龙', rank:'神将', desc:'所有友军受到的伤害 -10%', auraTakeDamage: 0.90 },
+  '百步穿杨': { id:'百步穿杨', name:'百步穿杨', rank:'上将', desc:'攻击距离越远伤害越高（1格×1.0 / 2格×1.2 / 3格×1.4）', rangeDamageBonus: true },
+  '铁骑': { id:'铁骑', name:'铁骑', rank:'上将', desc:'本回合移动 3 格以上再攻击，伤害 +30%', chargeBonus: 0.30 },
+  '古之恶来': { id:'古之恶来', name:'古之恶来', rank:'上将', desc:'HP 低于 30% 时，攻击 ×2', lowHpAtkMult: 2.0 },
+  '虎痴': { id:'虎痴', name:'虎痴', rank:'上将', desc:'最大 HP +30%', statMod: { hpMult: 1.30 } },
+  '突袭': { id:'突袭', name:'突袭', rank:'上将', desc:'每回合首次攻击伤害 +50%', firstStrikeBonus: 0.50 },
+  '猛虎': { id:'猛虎', name:'猛虎', rank:'上将', desc:'击杀敌人后恢复 30 HP', killHeal: 30 },
+  '破军': { id:'破军', name:'破军', rank:'上将', desc:'攻击时目标防御 -20%', defReduce: 0.20 },
+  '疾风': { id:'疾风', name:'疾风', rank:'上将', desc:'移动力 +1', statMod: { mov: 1 } },
+  '铁壁': { id:'铁壁', name:'铁壁', rank:'上将', desc:'防御 +20%', statMod: { defMult: 1.20 } },
+  '神射': { id:'神射', name:'神射', rank:'上将', desc:'射程 +1', statMod: { range: 1 } },
+  '骁勇': { id:'骁勇', name:'骁勇', rank:'名将', desc:'攻击 +15%', statMod: { atkMult: 1.15 } },
+  '坚守': { id:'坚守', name:'坚守', rank:'名将', desc:'防御 +15%', statMod: { defMult: 1.15 } },
+  '迅捷': { id:'迅捷', name:'迅捷', rank:'名将', desc:'速度 +2', statMod: { spd: 2 } },
+  '强健': { id:'强健', name:'强健', rank:'名将', desc:'最大 HP +20', statMod: { hp: 20 } },
+  '反击强化': { id:'反击强化', name:'反击强化', rank:'名将', desc:'反击伤害 ×1.5', counterMult: 1.5 },
+  '先手': { id:'先手', name:'先手', rank:'名将', desc:'每回合首次攻击速度 +5', firstStrikeSpd: 5 },
+  '克敌': { id:'克敌', name:'克敌', rank:'名将', desc:'克制伤害额外 +20%', counterBonus: 0.20 },
+  '坚韧': { id:'坚韧', name:'坚韧', rank:'名将', desc:'HP 低于 30% 时，防御 ×2', lowHpDefMult: 2.0 },
+  '精准': { id:'精准', name:'精准', rank:'名将', desc:'攻击 +10%', statMod: { atkMult: 1.10 } },
+  '战意': { id:'战意', name:'战意', rank:'名将', desc:'每次击杀后攻击 +5%（战斗中累积）', killAtkStack: 0.05 },
+  '勇猛': { id:'勇猛', name:'勇猛', rank:'良将', desc:'攻击 +8%', statMod: { atkMult: 1.08 } },
+  '稳重': { id:'稳重', name:'稳重', rank:'良将', desc:'防御 +8%', statMod: { defMult: 1.08 } },
+  '敏捷': { id:'敏捷', name:'敏捷', rank:'良将', desc:'速度 +1', statMod: { spd: 1 } },
+  '健壮': { id:'健壮', name:'健壮', rank:'良将', desc:'最大 HP +10', statMod: { hp: 10 } },
+  '沉着': { id:'沉着', name:'沉着', rank:'良将', desc:'反击伤害 +10%', counterMult: 1.10 },
+};
+
+const TRAIT_POOL = {
+  '神将': ['无双', '武圣', '万人敌', '常胜', '卧龙'],
+  '上将': ['百步穿杨', '铁骑', '古之恶来', '虎痴', '突袭', '猛虎', '破军', '疾风', '铁壁', '神射'],
+  '名将': ['骁勇', '坚守', '迅捷', '强健', '反击强化', '先手', '克敌', '坚韧', '精准', '战意'],
+  '良将': ['勇猛', '稳重', '敏捷', '健壮', '沉着'],
+  '凡将': [],
+};
+
+const HISTORICAL_TRAIT = {
+  '吕布': '无双', '关羽': '武圣', '张飞': '万人敌', '赵云': '常胜', '诸葛亮': '卧龙',
+  '黄忠': '百步穿杨', '马超': '铁骑', '魏延': '疾风', '典韦': '古之恶来', '许褚': '虎痴',
+  '周瑜': '破军', '孙坚': '猛虎', '太史慈': '神射', '张辽': '突袭', '吕蒙': '铁壁',
+};
+
+function getHeroTrait(hero) {
+  if (!hero || !hero.trait) return null;
+  return TRAITS[hero.trait] || null;
+}
+
+/* ======================== 阵营数据 ======================== */
+
+const HISTORICAL_FACTION = {
+  '魏': ['曹操','夏侯霸','典韦','许褚','荀攸','程昱','陈群','张辽','张郃','邓艾','郝昭','羊祜','钟会'],
+  '蜀': ['刘备','关羽','张飞','赵云','诸葛亮','黄忠','魏延','关平','关索','关兴','关银屏','张苞','刘禅','马云禄','法正','徐庶'],
+  '吴': ['孙权','孙坚','孙尚香','周瑜','鲁肃','太史慈','吕蒙','周泰','吴国太','吴懿','诸葛恪','步练师'],
+  '黄巾': ['张角','于吉','左慈'],
+  '荆州': ['黄月英','审配','田丰'],
+  '益州': ['张纮','张昭'],
+  '西凉': ['吕布','吕玲绮','董卓','华雄','公孙瓒','貂蝉'],
+  '中立': ['蔡琰','王异','王元姬','甄姬','华佗','张春华'],
+};
+
+const FACTIONS = {
+  '魏': { color:'#4a6aa8', desc:'挟天子以令诸侯，兵强马壮' },
+  '蜀': { color:'#3a8a3a', desc:'汉室宗亲，仁德布于四海' },
+  '吴': { color:'#a84a4a', desc:'据江东之险，坐观天下变' },
+  '黄巾': { color:'#c9a020', desc:'苍天已死，黄天当立' },
+  '荆州': { color:'#6a8a5a', desc:'九省通衢，士族豪门众多' },
+  '益州': { color:'#8a6a8a', desc:'天府之国，沃野千里' },
+  '西凉': { color:'#a86a2a', desc:'铁骑如风，来去无踪' },
+};
+
+/* ======================== 随机武将 ======================== */
+
+const SURNAMES = ['王','李','张','刘','陈','杨','赵','黄','周','吴','徐','孙','马','朱','胡','郭','林','何','高','罗','郑','梁','谢','宋','唐','许','韩','冯','邓','曹','彭','曾','肖','田','董','袁','潘','蒋','蔡','余','杜','叶','程','苏','魏','吕','丁','任','沈','姚','卢','姜','崔','钟','谭','陆','汪','范','金','石','廖','贾','夏','韦','付','方','白','邹','孟','熊','秦','邱','江','尹','薛','闫','段','雷','侯','龙','史','陶','黎','贺','顾','毛','郝','龚','邵','万','钱','严','赖','覃','洪','武','莫','孔'];
+const GIVEN_NAMES = ['平','虎','刚','武','雄','杰','勇','猛','义','信','诚','德','文','明','亮','英','豪','峰','山','海','江','河','云','风','雨','雷','林','石','铁','金','银','宝','贵','富','强','健','康','安','宁','忠','孝','仁','义','礼','智','信','勇','猛','毅','坚','恒','远','达','通','博','学','才','俊','杰','伟','成','功','名','利','禄','寿','喜','福','祥','瑞','丰','收','兴','盛','隆','昌','泰','康','乐','平','安','顺','和','睦','亲','善','良','恭','俭','让','温','柔','敦','厚','纯','朴','真','善','美','雅','静','清','明','辉','煌','灿','烂','耀','照','光','明','亮','朗','爽','畅','欢','欣','悦','喜','乐'];
+
+function randomName() {
+  const s = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+  const g = GIVEN_NAMES[Math.floor(Math.random() * GIVEN_NAMES.length)];
+  return s + g;
+}
+function randomHeroImg() {
+  if (!HERO_DATA || !HERO_DATA.randomPool || !HERO_DATA.randomPool.length) return '';
+  return HERO_DATA.randomPool[Math.floor(Math.random() * HERO_DATA.randomPool.length)];
+}
+
+function rollRandomRank() {
+  const r = Math.random() * 100;
+  if (r < 50) return '凡将';
+  if (r < 80) return '良将';
+  if (r < 95) return '名将';
+  if (r < 99) return '上将';
+  return '神将';
+}
+function randomTraitForRank(rank) {
+  const pool = TRAIT_POOL[rank];
+  if (!pool || !pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+function growthForRank(rank) {
+  const base = RANK_GROWTH[rank];
+  return {
+    atk: base.atk * (0.85 + Math.random() * 0.3),
+    def: base.def * (0.85 + Math.random() * 0.3),
+    hp: base.hp * (0.85 + Math.random() * 0.3),
+    spd: base.spd * (0.85 + Math.random() * 0.3),
+  };
+}
+
+function createRandomHero() {
+  const cls = ALL_CLASSES[Math.floor(Math.random() * ALL_CLASSES.length)];
+  const rank = rollRandomRank();
+  const growth = growthForRank(rank);
+  const trait = randomTraitForRank(rank);
+  return {
+    heroName: randomName(),
+    heroImg: randomHeroImg(),
+    cls: cls,
+    isHistorical: false,
+    level: 1, exp: 0,
+    hp: null, maxHp: null,       // 战斗后的当前血量（null = 满）
+    dead: false,                  // 阵亡标记
+    growth: growth,
+    trait: trait,
+    forcedRank: rank,
+  };
+}
+
+function createHistoricalHero(name, cls) {
+  return {
+    heroName: name,
+    heroImg: HERO_DATA.heroes[name] || '',
+    cls: cls || '骑兵',
+    isHistorical: true,
+    level: 1, exp: 0,
+    hp: null, maxHp: null,
+    dead: false,
+    growth: HISTORICAL_GROWTH[name] || RANK_GROWTH['名将'],
+    trait: HISTORICAL_TRAIT[name] || null,
+  };
+}
+
+function guessClassForHero(name) {
+  const cavalry = ['吕布','关羽','赵云','马超','张辽','公孙瓒','孙坚','夏侯霸','关兴','魏延'];
+  const archer = ['黄忠','太史慈','吕蒙','关银屏','马云禄','孙尚香','吕玲绮'];
+  const spear = ['张郃','张苞','关平','关索'];
+  const infantry = ['张飞','许褚','周泰','典韦','华雄','文丑','颜良'];
+  const strategist = ['诸葛亮','周瑜','徐庶','荀攸','程昱','陈群','法正','鲁肃','张昭','张纮','于吉','左慈','华佗','田丰','审配','羊祜'];
+  if (cavalry.includes(name)) return '骑兵';
+  if (archer.includes(name)) return '弓兵';
+  if (spear.includes(name)) return '枪兵';
+  if (infantry.includes(name)) return '步兵';
+  if (strategist.includes(name)) return '谋士';
+  return '步兵';
+}
+
+const HISTORICAL_GROWTH = {
+  '关羽':   { atk: 1.3, def: 1.0, hp: 12, spd: 0.55 },
+  '张飞':   { atk: 1.2, def: 1.2, hp: 11, spd: 0.50 },
+  '赵云':   { atk: 1.2, def: 1.1, hp: 11, spd: 0.60 },
+  '吕布':   { atk: 1.4, def: 1.0, hp: 11, spd: 0.50 },
+  '诸葛亮': { atk: 1.0, def: 1.0, hp: 10, spd: 0.75 },
+  '黄忠':   { atk: 1.1, def: 0.9, hp: 9,  spd: 0.45 },
+  '马超':   { atk: 1.1, def: 0.9, hp: 9,  spd: 0.55 },
+  '魏延':   { atk: 1.1, def: 0.9, hp: 10, spd: 0.40 },
+  '典韦':   { atk: 1.1, def: 1.0, hp: 10, spd: 0.35 },
+  '许褚':   { atk: 1.0, def: 1.1, hp: 10, spd: 0.35 },
+  '周瑜':   { atk: 0.9, def: 0.8, hp: 8,  spd: 0.70 },
+  '孙坚':   { atk: 1.0, def: 1.0, hp: 10, spd: 0.45 },
+  '太史慈': { atk: 1.0, def: 0.9, hp: 9,  spd: 0.50 },
+  '张辽':   { atk: 1.0, def: 1.0, hp: 10, spd: 0.45 },
+  '吕蒙':   { atk: 0.9, def: 0.9, hp: 9,  spd: 0.55 },
+  '刘备':   { atk: 0.8, def: 0.8, hp: 8,  spd: 0.35 },
+  '曹操':   { atk: 0.8, def: 0.8, hp: 8,  spd: 0.35 },
+  '孙权':   { atk: 0.7, def: 0.8, hp: 8,  spd: 0.40 },
+  '夏侯霸': { atk: 0.9, def: 0.8, hp: 8,  spd: 0.35 },
+  '张郃':   { atk: 0.8, def: 0.9, hp: 8,  spd: 0.35 },
+  '徐庶':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.55 },
+  '荀攸':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.55 },
+  '程昱':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.55 },
+  '法正':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.55 },
+  '鲁肃':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.55 },
+  '周泰':   { atk: 0.9, def: 0.9, hp: 9,  spd: 0.30 },
+  '黄月英': { atk: 0.7, def: 0.7, hp: 6,  spd: 0.60 },
+  '马云禄': { atk: 0.9, def: 0.7, hp: 7,  spd: 0.60 },
+  '关平':   { atk: 0.9, def: 0.8, hp: 8,  spd: 0.40 },
+  '关兴':   { atk: 0.9, def: 0.8, hp: 8,  spd: 0.40 },
+  '张苞':   { atk: 0.9, def: 0.8, hp: 8,  spd: 0.40 },
+  '诸葛恪': { atk: 0.7, def: 0.7, hp: 6,  spd: 0.55 },
+  '吴懿':   { atk: 0.8, def: 0.8, hp: 8,  spd: 0.35 },
+  '郝昭':   { atk: 0.8, def: 0.9, hp: 9,  spd: 0.35 },
+  '羊祜':   { atk: 0.7, def: 0.8, hp: 7,  spd: 0.50 },
+  '钟会':   { atk: 0.8, def: 0.7, hp: 7,  spd: 0.45 },
+  '邓艾':   { atk: 0.8, def: 0.8, hp: 8,  spd: 0.40 },
+  '张角':   { atk: 0.8, def: 0.7, hp: 7,  spd: 0.60 },
+  '貂蝉':   { atk: 0.7, def: 0.6, hp: 6,  spd: 0.65 },
+  '田丰':   { atk: 0.5, def: 0.6, hp: 5,  spd: 0.35 },
+  '审配':   { atk: 0.5, def: 0.7, hp: 5,  spd: 0.30 },
+  '张纮':   { atk: 0.5, def: 0.5, hp: 5,  spd: 0.35 },
+  '张昭':   { atk: 0.5, def: 0.5, hp: 5,  spd: 0.35 },
+  '关索':   { atk: 0.7, def: 0.6, hp: 6,  spd: 0.30 },
+  '关银屏': { atk: 0.7, def: 0.5, hp: 6,  spd: 0.35 },
+  '王异':   { atk: 0.6, def: 0.6, hp: 5,  spd: 0.30 },
+  '王元姬': { atk: 0.5, def: 0.6, hp: 5,  spd: 0.35 },
+  '蔡琰':   { atk: 0.4, def: 0.5, hp: 4,  spd: 0.40 },
+  '张春华': { atk: 0.6, def: 0.6, hp: 5,  spd: 0.35 },
+  '步练师': { atk: 0.4, def: 0.5, hp: 4,  spd: 0.40 },
+  '吴国太': { atk: 0.4, def: 0.5, hp: 5,  spd: 0.30 },
+  '公孙瓒': { atk: 0.7, def: 0.6, hp: 6,  spd: 0.40 },
+  '董卓':   { atk: 0.8, def: 0.7, hp: 7,  spd: 0.25 },
+  '华雄':   { atk: 0.8, def: 0.6, hp: 6,  spd: 0.30 },
+  '刘禅':   { atk: 0.2, def: 0.3, hp: 3,  spd: 0.10 },
+  '华佗':   { atk: 0.2, def: 0.3, hp: 3,  spd: 0.20 },
+  '于吉':   { atk: 0.4, def: 0.4, hp: 4,  spd: 0.30 },
+  '左慈':   { atk: 0.4, def: 0.4, hp: 4,  spd: 0.30 },
+  '甄姬':   { atk: 0.2, def: 0.3, hp: 3,  spd: 0.20 },
+  '吕玲绮': { atk: 0.5, def: 0.4, hp: 4,  spd: 0.30 },
+  '陈群':   { atk: 0.4, def: 0.6, hp: 5,  spd: 0.40 },
+  '孙尚香': { atk: 0.8, def: 0.6, hp: 6,  spd: 0.55 },
+};
+
+function getHeroGrowth(hero) {
+  if (hero.isHistorical && HISTORICAL_GROWTH[hero.heroName]) {
+    return HISTORICAL_GROWTH[hero.heroName];
+  }
+  if (hero.growth) return hero.growth;
+  return RANK_GROWTH['名将'];
+}
+function getHeroRank(hero) {
+  if (hero.forcedRank) return hero.forcedRank;
+  const g = getHeroGrowth(hero);
+  return rankFromGrowth(g);
+}
+
+function calcHeroStats(hero) {
+  const base = CLASS_STATS[hero.cls] || CLASS_STATS['步兵'];
+  const growth = getHeroGrowth(hero);
+  const rank = getHeroRank(hero);
+  const mult = RANK_INIT_MULT[rank];
+  const level = hero.level || 1;
+  const lvUp = level - 1;
+  let atk = Math.round(base.atk * mult + lvUp * growth.atk);
+  let def = Math.round(base.def * mult + lvUp * growth.def);
+  let spd = Math.round(base.spd + lvUp * growth.spd);
+  let hp = Math.round((80 + base.def * 2) * mult + lvUp * growth.hp);
+  let mov = base.mov;
+  let range = base.range;
+  const trait = getHeroTrait(hero);
+  if (trait && trait.statMod) {
+    const m = trait.statMod;
+    if (m.atkMult) atk = Math.round(atk * m.atkMult);
+    if (m.defMult) def = Math.round(def * m.defMult);
+    if (m.hpMult) hp = Math.round(hp * m.hpMult);
+    if (m.atk) atk += m.atk;
+    if (m.def) def += m.def;
+    if (m.hp) hp += m.hp;
+    if (m.spd) spd += m.spd;
+    if (m.mov) mov += m.mov;
+    if (m.range) range += m.range;
+  }
+  return {
+    atk: Math.max(1, atk), def: Math.max(0, def),
+    spd: Math.max(1, spd), hp: Math.max(1, hp),
+    mov, range, rank,
+    traitId: hero.trait || null,
+  };
+}
+
+/* ======================== 全局状态 ======================== */
+
+const STATE = { MAP: 'map', BATTLE: 'battle', ANIM: 'anim' };
+let mode = STATE.MAP;
+const PHASE = { SELECT: 'select', MOVE: 'move', COMMAND: 'command', TARGET: 'target', ANIM: 'anim' };
+
+const G = {
+  day: 1,
+  playerFaction: null,
+  player: {
+    x: 0, y: 0, gridCol: 0, gridRow: 0,
+    path: [], pathIdx: 0, speed: 300, moving: false, invuln: 0
+  },
+  playerHeroes: [], enemies: [], cities: [],
+  battle: null, anim: null,
+  capturedHeroes: [], usedHeroes: new Map(),
+  formation: [null, null, null, null, null, null, null, null, null],
+  moveSteps: 0, lastSpawnStep: 0, enemyCap: 20,
+  pendingFaction: null,
+  gold: 100,
+  currentCity: null,     // 当前可进入的城池
+  cityTavern: null,      // 当前酒馆刷新数据
+  inCity: null,          // 正在进入的城池对象
+};
+
+const RESPAWN_DAYS = 5;
+const MAX_HEROES = 6;
+const ENEMY_SPAWN_INTERVAL = 12;
+const CITY_ENTER_RANGE = 60;
+
+function enemyCountBySteps(steps) {
+  if (steps < 50) return 2;
+  if (steps < 150) return 3;
+  if (steps < 300) return 4;
+  if (steps < 500) return 5;
+  return 6;
+}
+
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function rand(a, b) { return a + Math.random() * (b - a); }
+function randInt(a, b) { return Math.floor(rand(a, b + 1)); }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function manhattan(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+
+function log(msg) {
+  const el = document.getElementById('log');
+  el.innerHTML = msg + '<br>' + el.innerHTML.split('<br>').slice(0, 4).join('<br>');
+}
+function showHint(text) { phaseHint.textContent = text; phaseHint.style.display = 'block'; }
+function hideHint() { phaseHint.style.display = 'none'; }
+function showToast(text, ms = 1200) {
+  toast.textContent = text;
+  toast.style.display = 'block';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.display = 'none'; }, ms);
+}
+function updateGoldUI() {
+  document.getElementById('goldAmount').textContent = G.gold;
+}
+function addGold(n) {
+  G.gold += n;
+  updateGoldUI();
+}
+
+function getDeployedHeroes() {
+  const used = new Set();
+  const result = [];
+  for (const idx of G.formation) {
+    if (idx === null || idx === undefined) continue;
+    if (used.has(idx)) continue;
+    if (idx >= G.playerHeroes.length) continue;
+    used.add(idx);
+    result.push({ hero: G.playerHeroes[idx], heroIdx: idx });
+    if (result.length >= MAX_HEROES) break;
+  }
+  return result;
+}
+function formationIndexToBattlePos(idx) {
+  const col = idx % 3;
+  const row = Math.floor(idx / 3);
+  return { x: col, y: 3 + row };
+}
+function markHeroActive(name) { G.usedHeroes.set(name, { status: 'active', until: 0 }); }
+function markHeroCooldown(name) { G.usedHeroes.set(name, { status: 'cooldown', until: G.day + RESPAWN_DAYS }); }
+function isHeroAvailable(name) {
+  const info = G.usedHeroes.get(name);
+  if (!info) return true;
+  if (info.status === 'active') return false;
+  if (info.status === 'cooldown') return G.day >= info.until;
+  return true;
+}
+function heroPlainName(hero) { return (hero.isHistorical ? '★' : '') + hero.heroName; }
+function unitDisplayShort(u) { return (u.isHistorical ? '★' : '') + u.name; }
+
+/* ======================== 地形 ======================== */
+
+const TILE_SIZE = 60;
+const MAP_COLS = 40;
+const MAP_ROWS = 30;
+const MAP_W = MAP_COLS * TILE_SIZE;
+const MAP_H = MAP_ROWS * TILE_SIZE;
+const TERRAIN = { PLAIN: 0, MOUNTAIN: 1, RIVER: 2, BRIDGE: 3, ROAD: 4 };
+let terrainMap = [];
+
+function terrainAt(col, row) {
+  if (col < 0 || col >= MAP_COLS || row < 0 || row >= MAP_ROWS) return TERRAIN.MOUNTAIN;
+  return terrainMap[row][col];
+}
+function terrainWalkable(col, row) {
+  const t = terrainAt(col, row);
+  if (t === TERRAIN.MOUNTAIN) return false;
+  if (t === TERRAIN.RIVER) return false;
+  return true;
+}
+function terrainSpeedMult(col, row) {
+  const t = terrainAt(col, row);
+  if (t === TERRAIN.ROAD) return 1.5;
+  return 1.0;
+}
+function generateTerrain() {
+  terrainMap = [];
+  for (let r = 0; r < MAP_ROWS; r++) {
+    const row = [];
+    for (let c = 0; c < MAP_COLS; c++) row.push(TERRAIN.PLAIN);
+    terrainMap.push(row);
+  }
+  paintMountainCluster(3, 8, 4, 3);
+  paintMountainCluster(28, 3, 5, 3);
+  paintMountainCluster(32, 25, 5, 3);
+  paintRiver([[18, 0], [18, 6], [17, 10], [17, 15], [18, 20], [17, 25], [17, 29]], 1);
+  paintRiver([[0, 16], [5, 16], [10, 16], [15, 16], [20, 16], [25, 16], [30, 16], [35, 16], [39, 16]], 1);
+  autoPlaceBridges();
+  const roads = [
+    [[8, 6], [13, 5], [18, 4], [22, 3], [25, 5], [27, 6]],
+    [[8, 6], [6, 4], [5, 2]],
+    [[8, 6], [10, 10], [18, 15], [20, 21]],
+    [[20, 21], [24, 23], [26, 24], [22, 22], [14, 25]],
+    [[20, 21], [15, 22], [12, 24], [8, 27]],
+    [[27, 6], [32, 10], [35, 13], [35, 14], [34, 20], [34, 24]],
+    [[35, 14], [38, 12], [37, 20], [34, 24]],
+    [[34, 24], [30, 22], [28, 23], [26, 24]],
+  ];
+  for (const road of roads) paintRoad(road);
+}
+function setTerrain(col, row, type) {
+  if (col < 0 || col >= MAP_COLS || row < 0 || row >= MAP_ROWS) return;
+  terrainMap[row][col] = type;
+}
+function paintMountainCluster(cx, cy, w, h) {
+  for (let r = cy; r < cy + h; r++) {
+    for (let c = cx; c < cx + w; c++) {
+      const dx = c - cx - w/2;
+      const dy = r - cy - h/2;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < w/2 - 0.5 || Math.random() < 0.7) {
+        setTerrain(c, r, TERRAIN.MOUNTAIN);
+      }
+    }
+  }
+}
+function paintRiver(points, width) {
+  for (let i = 0; i < points.length - 1; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[i + 1];
+    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) * 2;
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps;
+      const x = x1 + (x2 - x1) * t;
+      const y = y1 + (y2 - y1) * t;
+      for (let dy = -width; dy <= width; dy++) {
+        for (let dx = -width; dx <= width; dx++) {
+          if (Math.abs(dx) + Math.abs(dy) <= width) {
+            const c = Math.round(x + dx);
+            const r = Math.round(y + dy);
+            if (c >= 0 && c < MAP_COLS && r >= 0 && r < MAP_ROWS) {
+              if (terrainMap[r][c] !== TERRAIN.MOUNTAIN) {
+                terrainMap[r][c] = TERRAIN.RIVER;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+function autoPlaceBridges() {
+  const riverCells = [];
+  for (let r = 0; r < MAP_ROWS; r++) {
+    for (let c = 0; c < MAP_COLS; c++) {
+      if (terrainMap[r][c] === TERRAIN.RIVER) riverCells.push({ c, r });
+    }
+  }
+  const visited = new Set();
+  const components = [];
+  function getNeighbors(c, r) { return [[c+1,r],[c-1,r],[c,r+1],[c,r-1]]; }
+  for (const cell of riverCells) {
+    const key = cell.c + ',' + cell.r;
+    if (visited.has(key)) continue;
+    const comp = [];
+    const queue = [cell];
+    visited.add(key);
+    while (queue.length) {
+      const cur = queue.shift();
+      comp.push(cur);
+      for (const [nc, nr] of getNeighbors(cur.c, cur.r)) {
+        const nk = nc + ',' + nr;
+        if (visited.has(nk)) continue;
+        if (nc < 0 || nc >= MAP_COLS || nr < 0 || nr >= MAP_ROWS) continue;
+        if (terrainMap[nr][nc] !== TERRAIN.RIVER) continue;
+        visited.add(nk);
+        queue.push({ c: nc, r: nr });
+      }
+    }
+    components.push(comp);
+  }
+  for (const comp of components) {
+    if (comp.length < 3) continue;
+    let minC = Infinity, maxC = -Infinity, minR = Infinity, maxR = -Infinity;
+    for (const cell of comp) {
+      if (cell.c < minC) minC = cell.c;
+      if (cell.c > maxC) maxC = cell.c;
+      if (cell.r < minR) minR = cell.r;
+      if (cell.r > maxR) maxR = cell.r;
+    }
+    const horizontal = (maxC - minC) > (maxR - minR);
+    comp.sort((a, b) => horizontal ? (a.c - b.c) : (a.r - b.r));
+    for (let i = 0; i < comp.length; i++) {
+      if (i % 5 !== 0) continue;
+      const cell = comp[i];
+      const dirs = horizontal ? [[0,-1],[0,0],[0,1]] : [[-1,0],[0,0],[1,0]];
+      for (const [dc, dr] of dirs) {
+        const cc = cell.c + dc;
+        const rr = cell.r + dr;
+        if (cc < 0 || cc >= MAP_COLS || rr < 0 || rr >= MAP_ROWS) continue;
+        if (terrainMap[rr][cc] === TERRAIN.RIVER) {
+          terrainMap[rr][cc] = TERRAIN.BRIDGE;
+        }
+      }
+    }
+  }
+}
+function paintRoad(points) {
+  for (let i = 0; i < points.length - 1; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[i + 1];
+    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) * 3;
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps;
+      const x = Math.round(x1 + (x2 - x1) * t);
+      const y = Math.round(y1 + (y2 - y1) * t);
+      if (x >= 0 && x < MAP_COLS && y >= 0 && y < MAP_ROWS) {
+        if (terrainMap[y][x] === TERRAIN.PLAIN) {
+          terrainMap[y][x] = TERRAIN.ROAD;
+        }
+      }
+    }
+  }
+}
+
+function worldToGrid(x, y) {
+  return { col: Math.floor(x / TILE_SIZE), row: Math.floor(y / TILE_SIZE) };
+}
+function gridToWorld(col, row) {
+  return { x: col * TILE_SIZE + TILE_SIZE / 2, y: row * TILE_SIZE + TILE_SIZE / 2 };
+}
+function gridToWorldCorner(col, row) {
+  return { x: col * TILE_SIZE, y: row * TILE_SIZE };
+}
+
+function findPathGrid(startCol, startRow, endCol, endRow) {
+  if (startCol === endCol && startRow === endRow) return [];
+  if (!terrainWalkable(endCol, endRow)) return null;
+  const visited = new Set();
+  const queue = [{ col: startCol, row: startRow, path: [] }];
+  visited.add(startCol + ',' + startRow);
+  const dirs = [
+    [1,0],[-1,0],[0,1],[0,-1],
+    [1,1],[1,-1],[-1,1],[-1,-1]
+  ];
+  while (queue.length) {
+    const cur = queue.shift();
+    if (cur.path.length > 200) return null;
+    for (const [dx, dy] of dirs) {
+      const nc = cur.col + dx;
+      const nr = cur.row + dy;
+      const key = nc + ',' + nr;
+      if (nc < 0 || nc >= MAP_COLS || nr < 0 || nr >= MAP_ROWS) continue;
+      if (visited.has(key)) continue;
+      if (!terrainWalkable(nc, nr)) continue;
+      if (dx !== 0 && dy !== 0) {
+        if (!terrainWalkable(cur.col + dx, cur.row)) continue;
+        if (!terrainWalkable(cur.col, cur.row + dy)) continue;
+      }
+      const newPath = [...cur.path, { col: nc, row: nr }];
+      if (nc === endCol && nr === endRow) return newPath;
+      visited.add(key);
+      queue.push({ col: nc, row: nr, path: newPath });
+    }
+  }
+  return null;
+}
+
+/* ======================== 出生选择 ======================== */
+
+function showBirthScreen() {
+  const grid = document.getElementById('birthGrid');
+  grid.innerHTML = '';
+  for (const [faction, info] of Object.entries(FACTIONS)) {
+    const card = document.createElement('div');
+    card.className = 'birthCard';
+    const heroNames = HISTORICAL_FACTION[faction] || [];
+    let headB64 = '';
+    for (const n of heroNames) {
+      if (HERO_DATA.heroes[n]) { headB64 = HERO_DATA.heroes[n]; break; }
+    }
+    card.innerHTML = `
+      <img class="head" src="${headB64}" alt="">
+      <div class="faction">${faction}</div>
+      <div class="desc">${info.desc}</div>
+    `;
+    card.onclick = () => openHeroPick(faction);
+    grid.appendChild(card);
+  }
+  const save = loadSaveData();
+  if (save) {
+    document.getElementById('continueBtn').style.display = 'block';
+    document.getElementById('birthDivider').style.display = 'block';
+    document.getElementById('continueBtn').onclick = () => {
+      restoreFromSave(save);
+      document.getElementById('birthScreen').style.display = 'none';
+      document.getElementById('campBtn').style.display = 'block';
+      log('欢迎回来。');
+      requestAnimationFrame(loop);
+    };
+  }
+  document.getElementById('birthScreen').style.display = 'flex';
+}
+
+function openHeroPick(faction) {
+  G.pendingFaction = faction;
+  document.getElementById('birthScreen').style.display = 'none';
+  document.getElementById('pickTitle').textContent = faction + ' · 选择主将';
+  const grid = document.getElementById('heroPickGrid');
+  grid.innerHTML = '';
+  const heroNames = HISTORICAL_FACTION[faction] || [];
+  const rankOrder = { '神将': 0, '上将': 1, '名将': 2, '良将': 3, '凡将': 4 };
+  const entries = [];
+  for (const name of heroNames) {
+    if (!HERO_DATA.heroes[name]) continue;
+    const h = createHistoricalHero(name, guessClassForHero(name));
+    const s = calcHeroStats(h);
+    entries.push({ name, hero: h, stats: s });
+  }
+  entries.sort((a, b) => (rankOrder[a.stats.rank] ?? 9) - (rankOrder[b.stats.rank] ?? 9));
+  for (const e of entries) {
+    const h = e.hero;
+    const s = e.stats;
+    const color = RANK_COLOR[s.rank];
+    const trait = getHeroTrait(h);
+    const traitHtml = trait
+      ? `<div class="trait"><span class="traitName">【${trait.name}】</span>${trait.desc}</div>`
+      : '';
+    const card = document.createElement('div');
+    card.className = 'pickCard';
+    card.style.borderColor = color;
+    card.innerHTML = `
+      <img class="head" src="${h.heroImg || ''}" alt="" style="border-color:${color}">
+      <div class="info">
+        <div class="name" style="color:${color}">★${h.heroName}</div>
+        <div class="cls">【${s.rank}】${h.cls}</div>
+        <div class="stat">HP: <span>${s.hp}</span>　攻: <span>${s.atk}</span></div>
+        <div class="stat">防: <span>${s.def}</span>　速: <span>${s.spd}</span></div>
+        <div class="stat">移动: <span>${s.mov}</span>　射程: <span>${s.range}</span></div>
+        ${traitHtml}
+      </div>
+    `;
+    card.onclick = () => pickHero(h);
+    grid.appendChild(card);
+  }
+  document.getElementById('heroPickScreen').style.display = 'flex';
+}
+
+document.getElementById('pickBack').onclick = () => {
+  document.getElementById('heroPickScreen').style.display = 'none';
+  document.getElementById('birthScreen').style.display = 'flex';
+};
+
+function pickHero(hero) {
+  const faction = G.pendingFaction;
+  G.playerFaction = faction;
+  document.getElementById('heroPickScreen').style.display = 'none';
+  markHeroActive(hero.heroName);
+  const r1 = createRandomHero();
+  const r2 = createRandomHero();
+  G.playerHeroes = [hero, r1, r2];
+  G.formation = [0, 1, 2, null, null, null, null, null, null];
+  showWelcome(hero);
+}
+
+function showWelcome(hero) {
+  document.getElementById('welcomeHead').src = hero.heroImg;
+  const s = calcHeroStats(hero);
+  const color = RANK_COLOR[s.rank];
+  document.getElementById('welcomeName').innerHTML =
+    `<span style="color:${color}">${hero.isHistorical ? '★ ' : ''}${hero.heroName}</span>`;
+  document.getElementById('welcomeRole').innerHTML =
+    `<span style="color:${color}">【${s.rank}】</span> ${hero.cls}${hero.isHistorical ? ' · 历史名将' : ''}`;
+  const trait = getHeroTrait(hero);
+  if (trait) {
+    document.getElementById('welcomeTrait').innerHTML = `【${trait.name}】${trait.desc}`;
+  } else {
+    document.getElementById('welcomeTrait').innerHTML = '';
+  }
+  document.getElementById('welcomeScreen').style.display = 'flex';
+}
+
+document.getElementById('welcomeEnter').onclick = () => {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  initMap();
+  document.getElementById('campBtn').style.display = 'block';
+  updateGoldUI();
+  log('点击地面移动，撞上敌人进入战斗。');
+  requestAnimationFrame(loop);
+};
+
+/* ======================== 城市与初始化 ======================== */
+
+function initCities() {
+  G.cities = [
+    { col: 8, row: 6, name: '洛阳', faction: '魏', size: '大城' },
+    { col: 13, row: 5, name: '邺城', faction: '魏', size: '中城' },
+    { col: 22, row: 3, name: '许昌', faction: '魏', size: '中城' },
+    { col: 27, row: 6, name: '宛城', faction: '魏', size: '小城' },
+    { col: 5, row: 2, name: '长安', faction: '西凉', size: '大城' },
+    { col: 35, row: 13, name: '建业', faction: '吴', size: '大城' },
+    { col: 38, row: 12, name: '寿春', faction: '吴', size: '中城' },
+    { col: 37, row: 20, name: '会稽', faction: '吴', size: '中城' },
+    { col: 34, row: 24, name: '柴桑', faction: '吴', size: '小城' },
+    { col: 20, row: 21, name: '襄阳', faction: '荆州', size: '大城' },
+    { col: 24, row: 23, name: '江陵', faction: '荆州', size: '中城' },
+    { col: 14, row: 25, name: '长沙', faction: '荆州', size: '中城' },
+    { col: 8, row: 27, name: '成都', faction: '益州', size: '大城' },
+    { col: 12, row: 24, name: '汉中', faction: '益州', size: '中城' },
+  ];
+}
+
+function initMap() {
+  generateTerrain();
+  initCities();
+  const startPos = gridToWorld(10, 9);
+  G.player.x = startPos.x;
+  G.player.y = startPos.y;
+  G.player.gridCol = 10;
+  G.player.gridRow = 9;
+  G.player.path = [];
+  G.player.moving = false;
+  G.player.invuln = 0;
+  G.enemies = [];
+  G.moveSteps = 0;
+  G.lastSpawnStep = 0;
+  for (let i = 0; i < 2; i++) spawnEnemy();
+  cam.x = clamp(G.player.x - W / 2, 0, Math.max(0, MAP_W - W));
+  cam.y = clamp(G.player.y - H / 2, 0, Math.max(0, MAP_H - H));
+}
+
+function randomWalkablePos() {
+  for (let tries = 0; tries < 200; tries++) {
+    const col = randInt(2, MAP_COLS - 3);
+    const row = randInt(2, MAP_ROWS - 3);
+    if (terrainWalkable(col, row)) {
+      const p = gridToWorld(col, row);
+      return { col, row, x: p.x, y: p.y };
+    }
+  }
+  const p = gridToWorld(20, 15);
+  return { col: 20, row: 15, x: p.x, y: p.y };
+}
+
+function spawnEnemy() {
+  const factionList = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉', '中立'];
+  const faction = factionList[randInt(0, factionList.length - 1)];
+  let mainHero;
+  if (faction === '中立') {
+    mainHero = createRandomHero();
+  } else {
+    const pool = (HISTORICAL_FACTION[faction] || [])
+      .filter(n => HERO_DATA.heroes[n])
+      .filter(n => isHeroAvailable(n));
+    if (pool.length && Math.random() < 0.2) {
+      const name = pool[randInt(0, pool.length - 1)];
+      mainHero = createHistoricalHero(name, guessClassForHero(name));
+      markHeroActive(name);
+    } else {
+      mainHero = createRandomHero();
+    }
+  }
+  const s = calcHeroStats(mainHero);
+  const pos = randomWalkablePos();
+  const count = enemyCountBySteps(G.moveSteps);
+  G.enemies.push({
+    col: pos.col, row: pos.row, x: pos.x, y: pos.y,
+    hp: s.hp, maxHp: s.hp,
+    heroName: mainHero.heroName, heroImg: mainHero.heroImg,
+    cls: mainHero.cls, faction: faction,
+    isHistorical: mainHero.isHistorical,
+    level: mainHero.level || 1,
+    rank: s.rank,
+    trait: mainHero.trait || null,
+    growth: mainHero.growth,
+    enemyCount: count,
+    targetCol: pos.col, targetRow: pos.row,
+    moveCooldown: rand(1, 3)
+  });
+}
+
+/* ======================== 大地图更新 ======================== */
+
+const cam = { x: 0, y: 0 };
+
+function updateMap(dt) {
+  const p = G.player;
+  if (p.invuln > 0) p.invuln -= dt;
+  const isMoving = p.moving && p.path.length > 0;
+  if (isMoving) {
+    const target = p.path[p.pathIdx];
+    const targetWorld = gridToWorld(target.col, target.row);
+    const dx = targetWorld.x - p.x;
+    const dy = targetWorld.y - p.y;
+    const d = Math.hypot(dx, dy);
+    const curGrid = worldToGrid(p.x, p.y);
+    const speedMult = terrainSpeedMult(curGrid.col, curGrid.row);
+    const realSpeed = p.speed * speedMult;
+    if (d < 4) {
+      p.x = targetWorld.x; p.y = targetWorld.y;
+      p.gridCol = target.col; p.gridRow = target.row;
+      p.pathIdx++;
+      G.moveSteps++;
+      if (G.moveSteps - G.lastSpawnStep >= ENEMY_SPAWN_INTERVAL) {
+        G.lastSpawnStep = G.moveSteps;
+        if (G.enemies.length < G.enemyCap) {
+          spawnEnemy();
+          log('远处传来兵戈声……');
+        }
+      }
+      if (p.pathIdx >= p.path.length) {
+        p.moving = false; p.path = []; p.pathIdx = 0;
+      }
+    } else {
+      p.x += dx / d * realSpeed * dt;
+      p.y += dy / d * realSpeed * dt;
+    }
+  }
+  if (isMoving) {
+    for (const e of G.enemies) {
+      e.moveCooldown -= dt;
+      if (e.moveCooldown <= 0) {
+        const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+        const [dx, dy] = dirs[randInt(0, 3)];
+        const nc = e.col + dx;
+        const nr = e.row + dy;
+        if (nc >= 0 && nc < MAP_COLS && nr >= 0 && nr < MAP_ROWS && terrainWalkable(nc, nr)) {
+          e.targetCol = nc; e.targetRow = nr;
+        }
+        e.moveCooldown = rand(2, 5);
+      }
+      const tgt = gridToWorld(e.targetCol, e.targetRow);
+      const dx = tgt.x - e.x;
+      const dy = tgt.y - e.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 4) {
+        e.x += dx / d * 60 * dt;
+        e.y += dy / d * 60 * dt;
+      } else {
+        e.col = e.targetCol; e.row = e.targetRow;
+      }
+      const isSameFaction = (G.playerFaction && e.faction === G.playerFaction);
+      if (!isSameFaction && dist(e, p) < 200) {
+        const dx = p.x - e.x, dy = p.y - e.y;
+        const dd = Math.hypot(dx, dy) || 1;
+        e.x += dx / dd * 80 * dt;
+        e.y += dy / dd * 80 * dt;
+      }
+    }
+  }
+  for (const e of G.enemies) {
+    const isSameFaction = (G.playerFaction && e.faction === G.playerFaction);
+    if (!isSameFaction && p.invuln <= 0 && dist(e, p) < 30 && mode === STATE.MAP) {
+      startBattle(e);
+      break;
+    }
+  }
+  // 检测最近的城池（用格子距离）
+  let nearestCity = null;
+  for (const city of G.cities) {
+    const dg = Math.abs(p.gridCol - city.col) + Math.abs(p.gridRow - city.row);
+    if (dg <= 1) { nearestCity = city; break; }
+  }
+  G.currentCity = nearestCity;
+  const btn = document.getElementById('enterCityBtn');
+  if (nearestCity) {
+    btn.textContent = '进 入 ' + nearestCity.name;
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+  }
+  cam.x = clamp(p.x - W / 2, 0, Math.max(0, MAP_W - W));
+  cam.y = clamp(p.y - H / 2, 0, Math.max(0, MAP_H - H));
+}
+
+/* ======================== 大地图绘制 ======================== */
+
+function drawMap() {
+  ctx.fillStyle = '#1f2a18';
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(-cam.x, -cam.y);
+  const startCol = Math.max(0, Math.floor(cam.x / TILE_SIZE) - 1);
+  const endCol = Math.min(MAP_COLS - 1, Math.ceil((cam.x + W) / TILE_SIZE) + 1);
+  const startRow = Math.max(0, Math.floor(cam.y / TILE_SIZE) - 1);
+  const endRow = Math.min(MAP_ROWS - 1, Math.ceil((cam.y + H) / TILE_SIZE) + 1);
+  for (let r = startRow; r <= endRow; r++) {
+    for (let c = startCol; c <= endCol; c++) {
+      const p = gridToWorldCorner(c, r);
+      const t = terrainAt(c, r);
+      if (t === TERRAIN.PLAIN) {
+        ctx.fillStyle = (c + r) % 2 ? '#3a4a2e' : '#354428';
+        ctx.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
+      } else if (t === TERRAIN.ROAD) {
+        ctx.fillStyle = '#5a4a2e';
+        ctx.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
+      } else if (t === TERRAIN.RIVER) {
+        ctx.fillStyle = '#2a4a6a';
+        ctx.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
+      } else if (t === TERRAIN.BRIDGE) {
+        ctx.fillStyle = '#2a4a6a';
+        ctx.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = '#7a5a2a';
+        ctx.fillRect(p.x + 4, p.y + TILE_SIZE * 0.2, TILE_SIZE - 8, TILE_SIZE * 0.6);
+        ctx.strokeStyle = '#5a3a1a';
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 3; i++) {
+          const yy = p.y + TILE_SIZE * (0.3 + i * 0.2);
+          ctx.beginPath();
+          ctx.moveTo(p.x + 6, yy);
+          ctx.lineTo(p.x + TILE_SIZE - 6, yy);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  ctx.strokeStyle = 'rgba(0,0,0,.12)';
+  ctx.lineWidth = 1;
+  for (let c = startCol; c <= endCol; c++) {
+    const p = gridToWorldCorner(c, 0);
+    ctx.beginPath(); ctx.moveTo(p.x, cam.y); ctx.lineTo(p.x, cam.y + H); ctx.stroke();
+  }
+  for (let r = startRow; r <= endRow; r++) {
+    const p = gridToWorldCorner(0, r);
+    ctx.beginPath(); ctx.moveTo(cam.x, p.y); ctx.lineTo(cam.x + W, p.y); ctx.stroke();
+  }
+  for (let r = startRow; r <= endRow; r++) {
+    for (let c = startCol; c <= endCol; c++) {
+      if (terrainAt(c, r) !== TERRAIN.MOUNTAIN) continue;
+      const p = gridToWorld(c, r);
+      drawMountainPeak(p.x, p.y, TILE_SIZE);
+    }
+  }
+  for (const city of G.cities) {
+    const p = gridToWorld(city.col, city.row);
+    const img = IMG[city.size];
+    const sz = city.size === '大城' ? 100 : city.size === '中城' ? 76 : 56;
+    if (img) ctx.drawImage(img, p.x - sz/2, p.y - sz/2, sz, sz);
+    ctx.fillStyle = 'rgba(0,0,0,.7)';
+    ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(city.name, p.x, p.y + sz/2 + 14);
+    ctx.fillStyle = '#c9a96a'; ctx.font = '11px sans-serif';
+    ctx.fillText(city.faction, p.x, p.y + sz/2 + 28);
+  }
+  for (const e of G.enemies) {
+    const isSameFaction = (G.playerFaction && e.faction === G.playerFaction);
+    const color = RANK_COLOR[e.rank] || '#888';
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - 4, 26, 0, 7);
+    ctx.fillStyle = color + '33';
+    ctx.fill();
+    drawUnitSprite(ctx, e.cls, isSameFaction ? 'A' : 'B', e.x - 22, e.y - 28, 44, true);
+    const prefix = isSameFaction ? '【友】' : '';
+    const star = e.isHistorical ? '★' : '';
+    ctx.fillStyle = color;
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(prefix + star + e.heroName, e.x, e.y - 32);
+  }
+  const p = G.player;
+  if (p.moving && p.path.length > 0) {
+    ctx.strokeStyle = 'rgba(255,220,120,.8)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    for (let i = p.pathIdx; i < p.path.length; i++) {
+      const w = gridToWorld(p.path[i].col, p.path[i].row);
+      ctx.lineTo(w.x, w.y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (p.invuln > 0 && Math.floor(p.invuln * 10) % 2 === 0) ctx.globalAlpha = 0.5;
+  const firstHero = G.playerHeroes[0];
+  const drew = firstHero && firstHero.heroImg ? drawPlayerAvatar(p.x, p.y, 28, firstHero.heroImg) : false;
+  if (drew) {
+    ctx.strokeStyle = '#c9a96a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 28, 0, 7);
+    ctx.stroke();
+  } else {
+    const deployed = getDeployedHeroes();
+    const mainCls = deployed.length ? deployed[0].hero.cls : '骑兵';
+    drawUnitSprite(ctx, mainCls, 'A', p.x - 26, p.y - 32, 52, true);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawMountainPeak(cx, cy, size) {
+  const h = size * 0.9;
+  const w = size * 0.9;
+  ctx.fillStyle = 'rgba(0,0,0,.3)';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + size * 0.35, w * 0.5, size * 0.12, 0, 0, 7);
+  ctx.fill();
+  ctx.fillStyle = '#4a4038';
+  ctx.beginPath();
+  ctx.moveTo(cx - w/2, cy + size * 0.3);
+  ctx.lineTo(cx, cy - h/2);
+  ctx.lineTo(cx + w/2, cy + size * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#6a5e50';
+  ctx.beginPath();
+  ctx.moveTo(cx - w/2, cy + size * 0.3);
+  ctx.lineTo(cx, cy - h/2);
+  ctx.lineTo(cx, cy + size * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#d8e0e8';
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.15, cy - h * 0.22);
+  ctx.lineTo(cx, cy - h/2);
+  ctx.lineTo(cx + w * 0.15, cy - h * 0.22);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ======================== 战棋战斗 ======================== */
+
+
+
+function startBattle(enemy) {
+  const deployed = getDeployedHeroes();
+  const allies = [];
+  for (let i = 0; i < G.formation.length; i++) {
+    const heroIdx = G.formation[i];
+    if (heroIdx === null || heroIdx === undefined) continue;
+    if (heroIdx >= G.playerHeroes.length) continue;
+    const h = G.playerHeroes[heroIdx];
+    if (h.dead) continue;   // 阵亡武将不上场
+    if (allies.some(a => a.heroIdx === heroIdx)) continue;
+    const s = calcHeroStats(h);
+    const pos = formationIndexToBattlePos(i);
+    // 用武将保存的 HP（可能未满）
+    let curHp = (h.hp !== null && h.hp !== undefined) ? h.hp : s.hp;
+    if (curHp <= 0) curHp = 1;
+    allies.push({
+      id: 100 + i, heroIdx,
+      name: h.heroName, heroImg: h.heroImg,
+      isHistorical: h.isHistorical, cls: h.cls, team: 'A',
+      x: pos.x, y: pos.y,
+      hp: curHp, maxHp: s.hp,
+      atk: s.atk, def: s.def,
+      mov: s.mov, spd: s.spd, range: s.range,
+      rank: s.rank, level: h.level || 1,
+      trait: h.trait || null,
+      killCount: 0, hasAttacked: false, movedDist: 0,
+      acted: false
+    });
+    if (allies.length >= MAX_HEROES) break;
+  }
+
+  const foeCount = enemy.enemyCount || 3;
+  const foeMainCls = enemy.cls || '步兵';
+  const foeGrowth = enemy.growth || RANK_GROWTH[enemy.rank] || RANK_GROWTH['名将'];
+  const foeDummy = {
+    cls: foeMainCls, level: enemy.level || 1,
+    growth: foeGrowth, isHistorical: enemy.isHistorical,
+    trait: enemy.trait || null,
+  };
+  const foeStats = calcHeroStats(foeDummy);
+  const foes = [{
+    id: 101, name: enemy.heroName, heroImg: enemy.heroImg,
+    isHistorical: enemy.isHistorical, cls: foeMainCls, team: 'B',
+    x: 9, y: 4, hp: foeStats.hp, maxHp: foeStats.hp,
+    atk: foeStats.atk, def: foeStats.def,
+    mov: foeStats.mov, spd: foeStats.spd, range: foeStats.range,
+    rank: foeStats.rank, level: enemy.level || 1,
+    trait: enemy.trait || null,
+    killCount: 0, hasAttacked: false, movedDist: 0,
+    acted: false
+  }];
+  const foePositions = [[9,4],[9,5],[10,6],[8,3],[8,6],[10,4]];
+  for (let i = 1; i < foeCount; i++) {
+    const h = createRandomHero();
+    const s = calcHeroStats(h);
+    const pos = foePositions[i] || [10, 5];
+    foes.push({
+      id: 102 + i, name: h.heroName, heroImg: h.heroImg,
+      isHistorical: false, cls: h.cls, team: 'B',
+      x: pos[0], y: pos[1], hp: s.hp, maxHp: s.hp,
+      atk: s.atk, def: s.def,
+      mov: s.mov, spd: s.spd, range: s.range,
+      rank: s.rank, level: 1,
+      trait: h.trait || null,
+      killCount: 0, hasAttacked: false, movedDist: 0,
+      acted: false
+    });
+  }
+
+  G.battle = {
+    units: [...allies, ...foes],
+    turn: 'A', selected: null, moveRange: [], path: [],
+    phase: PHASE.SELECT, round: 1,
+    originPos: null, validTargets: [],
+    showAttackRange: false, anyActedThisTurn: false,
+    enemyRef: enemy
+  };
+  G.anim = null;
+  mode = STATE.BATTLE;
+  hideCmdMenu(); hideUnitInfo(); hideHint();
+  document.getElementById('btnEndTurn').style.display = 'inline-block';
+  document.getElementById('btnBack').style.display = 'inline-block';
+  document.getElementById('campBtn').style.display = 'none';
+  document.getElementById('enterCityBtn').style.display = 'none';
+  document.getElementById('infoLeft').textContent = '战斗 · 第1回合';
+  log('遭遇 ' + enemy.faction + ' 部队，进入战斗！');
+}
+
+function tileAt(px, py) {
+  const ox = (W - BCOLS * TILE) / 2;
+  const oy = (H - BROWS * TILE) / 2;
+  const cx = Math.floor((px - ox) / TILE);
+  const cy = Math.floor((py - oy) / TILE);
+  if (cx < 0 || cx >= BCOLS || cy < 0 || cy >= BROWS) return null;
+  return { x: cx, y: cy };
+}
+function tileCenter(tx, ty) {
+  const ox = (W - BCOLS * TILE) / 2;
+  const oy = (H - BROWS * TILE) / 2;
+  return { x: ox + tx * TILE + TILE/2, y: oy + ty * TILE + TILE/2 };
+}
+function unitAt(x, y) {
+  return G.battle.units.find(u => u.hp > 0 && u.x === x && u.y === y);
+}
+function inBounds(x, y) { return x >= 0 && x < BCOLS && y >= 0 && y < BROWS; }
+function computeMoveRange(unit) {
+  const range = [];
+  const visited = new Set();
+  const queue = [{ x: unit.x, y: unit.y, d: 0 }];
+  visited.add(unit.x + ',' + unit.y);
+  while (queue.length) {
+    const cur = queue.shift();
+    if (cur.d > 0) range.push({ x: cur.x, y: cur.y, d: cur.d });
+    if (cur.d >= unit.mov) continue;
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+      const nx = cur.x + dx, ny = cur.y + dy;
+      const key = nx + ',' + ny;
+      if (!inBounds(nx, ny) || visited.has(key)) continue;
+      if (unitAt(nx, ny)) continue;
+      visited.add(key);
+      queue.push({ x: nx, y: ny, d: cur.d + 1 });
+    }
+  }
+  return range;
+}
+function findPath(unit, tx, ty) {
+  const start = unit.x + ',' + unit.y;
+  const goal = tx + ',' + ty;
+  const prev = { [start]: null };
+  const queue = [{ x: unit.x, y: unit.y }];
+  while (queue.length) {
+    const cur = queue.shift();
+    if (cur.x === tx && cur.y === ty) break;
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+      const nx = cur.x + dx, ny = cur.y + dy;
+      const key = nx + ',' + ny;
+      if (!inBounds(nx, ny) || prev.hasOwnProperty(key)) continue;
+      const other = unitAt(nx, ny);
+      if (other && other !== unit) continue;
+      prev[key] = cur.x + ',' + cur.y;
+      queue.push({ x: nx, y: ny });
+    }
+  }
+  if (!prev.hasOwnProperty(goal)) return [];
+  const path = [];
+  let cur = goal;
+  while (cur && cur !== start) {
+    const [x, y] = cur.split(',').map(Number);
+    path.unshift({ x, y });
+    cur = prev[cur];
+  }
+  return path;
+}
+function inAttackRange(a, b) {
+  const d = manhattan(a, b);
+  return d >= 1 && d <= a.range;
+}
+function getAttackableTargets(unit) {
+  return G.battle.units.filter(o =>
+    o.hp > 0 && o.team !== unit.team && inAttackRange(unit, o)
+  );
+}
+function getRangeTiles(unit) {
+  const tiles = [];
+  const r = unit.range;
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      if (Math.abs(dx) + Math.abs(dy) > r) continue;
+      const tx = unit.x + dx, ty = unit.y + dy;
+      if (inBounds(tx, ty)) tiles.push({ x: tx, y: ty });
+    }
+  }
+  return tiles;
+}
+
+function battleClick(px, py) {
+  const b = G.battle;
+  if (!b || G.anim || b.turn !== 'A') return;
+  const t = tileAt(px, py);
+  if (!t) return;
+  if (b.phase === PHASE.SELECT) {
+    const u = unitAt(t.x, t.y);
+    if (u && u.team === 'A' && !u.acted) selectUnit(u);
+    else if (u) showUnitInfo(u);
+  } else if (b.phase === PHASE.MOVE && b.selected) {
+    const inRange = b.moveRange.some(m => m.x === t.x && m.y === t.y) ||
+                    (t.x === b.selected.x && t.y === b.selected.y);
+    if (!inRange) {
+      const u = unitAt(t.x, t.y);
+      if (u === b.selected) cancelMove();
+      else if (u) showUnitInfo(u);
+      return;
+    }
+    b.originPos = { x: b.selected.x, y: b.selected.y };
+    if (t.x === b.selected.x && t.y === b.selected.y) {
+      b.selected.movedDist = 0;
+      b.phase = PHASE.COMMAND; showCmdMenu(b.selected); return;
+    }
+    const path = findPath(b.selected, t.x, t.y);
+    if (path.length) {
+      const moveDist = path.length;
+      b.path = path;
+      b.phase = PHASE.ANIM;
+      animateMove(b.selected, path, () => {
+        b.selected.x = t.x; b.selected.y = t.y;
+        b.selected.movedDist = moveDist;
+        b.path = []; b.phase = PHASE.COMMAND;
+        showCmdMenu(b.selected);
+      });
+    }
+  } else if (b.phase === PHASE.TARGET && b.selected) {
+    const u = unitAt(t.x, t.y);
+    if (u && b.validTargets.includes(u)) {
+      hideUnitInfo(); hideHint();
+      doAttack(b.selected, u);
+    } else if (u) {
+      showUnitInfo(u);
+    } else {
+      b.phase = PHASE.COMMAND;
+      b.validTargets = []; b.showAttackRange = false;
+      showCmdMenu(b.selected);
+    }
+  }
+}
+
+function selectUnit(u) {
+  const b = G.battle;
+  b.selected = u;
+  b.moveRange = computeMoveRange(u);
+  b.path = [];
+  b.phase = PHASE.MOVE;
+  b.originPos = { x: u.x, y: u.y };
+  u.movedDist = 0;
+  hideCmdMenu(); showUnitInfo(u);
+  showHint('移动模式：点击绿色格子移动，点自己取消');
+}
+function cancelMove() {
+  const b = G.battle;
+  b.selected = null; b.moveRange = []; b.path = [];
+  b.phase = PHASE.SELECT;
+  hideCmdMenu(); hideUnitInfo(); hideHint();
+}
+function showCmdMenu(unit) {
+  const b = G.battle;
+  cmdMenu.innerHTML = '';
+  const btnAtk = document.createElement('button');
+  btnAtk.className = 'atk'; btnAtk.textContent = '攻击';
+  btnAtk.onclick = (e) => { e.stopPropagation(); enterTargetMode(); };
+  cmdMenu.appendChild(btnAtk);
+  const btnWait = document.createElement('button');
+  btnWait.className = 'wait'; btnWait.textContent = '待机';
+  btnWait.onclick = (e) => {
+    e.stopPropagation();
+    hideCmdMenu(); hideHint();
+    finishUnit(unit);
+  };
+  cmdMenu.appendChild(btnWait);
+  const btnCancel = document.createElement('button');
+  btnCancel.className = 'cancel'; btnCancel.textContent = '取消';
+  btnCancel.onclick = (e) => {
+    e.stopPropagation();
+    if (b.originPos) { unit.x = b.originPos.x; unit.y = b.originPos.y; }
+    hideCmdMenu();
+    b.phase = PHASE.MOVE;
+    b.moveRange = computeMoveRange(unit);
+    showUnitInfo(unit);
+    showHint('移动模式：点击绿色格子移动，点自己取消');
+  };
+  cmdMenu.appendChild(btnCancel);
+  cmdMenu.style.display = 'flex';
+  showUnitInfo(unit);
+  showHint('选择指令：攻击 / 待机 / 取消');
+}
+function hideCmdMenu() { cmdMenu.style.display = 'none'; cmdMenu.innerHTML = ''; }
+
+function enterTargetMode() {
+  const b = G.battle;
+  hideCmdMenu();
+  b.phase = PHASE.TARGET;
+  b.validTargets = getAttackableTargets(b.selected);
+  b.showAttackRange = true;
+  if (b.validTargets.length === 0) showHint('射程内无目标，点空白处返回');
+  else showHint('目标选择：点击红框敌人攻击，点空白处返回');
+}
+
+/* ======================== 特性战斗生效 ======================== */
+
+function teamHasAura(team, teamKey) {
+  return G.battle.units.some(u =>
+    u.hp > 0 && u.team === team && u.trait === teamKey
+  );
+}
+
+function calcDamage(attacker, defender, isCounter) {
+  const atkTrait = attacker.trait ? TRAITS[attacker.trait] : null;
+  const defTrait = defender.trait ? TRAITS[defender.trait] : null;
+  const mult = getCounterMultiplier(attacker.cls, defender.cls);
+  let dmg = attacker.atk * mult;
+  if (atkTrait) {
+    if (atkTrait.ignoreDefRatio) {
+      dmg -= defender.def * 0.5 * (1 - atkTrait.ignoreDefRatio);
+    } else {
+      dmg -= defender.def * 0.5;
+    }
+    if (atkTrait.defReduce) dmg += defender.def * 0.5 * atkTrait.defReduce;
+    if (atkTrait.rangeDamageBonus) {
+      const d = manhattan(attacker, defender);
+      if (d >= 2) dmg *= 1 + (d - 1) * 0.2;
+    }
+    if (atkTrait.chargeBonus && attacker.movedDist >= 3) dmg *= 1 + atkTrait.chargeBonus;
+    if (atkTrait.lowHpAtkMult && attacker.hp / attacker.maxHp < 0.30) dmg *= atkTrait.lowHpAtkMult;
+    if (atkTrait.firstStrikeBonus && !attacker.hasAttacked) dmg *= 1 + atkTrait.firstStrikeBonus;
+    if (atkTrait.killAtkStack && attacker.killCount > 0) dmg *= 1 + attacker.killCount * atkTrait.killAtkStack;
+    if (atkTrait.counterBonus && mult > 1) dmg *= 1 + atkTrait.counterBonus;
+    if (isCounter && atkTrait.counterMult) dmg *= atkTrait.counterMult;
+  } else {
+    dmg -= defender.def * 0.5;
+  }
+  if (defTrait) {
+    if (defTrait.takeDamageMult) dmg *= defTrait.takeDamageMult;
+    if (defTrait.lowHpDefMult && defender.hp / defender.maxHp < 0.30) {
+      dmg -= defender.def * 0.5 * (defTrait.lowHpDefMult - 1);
+    }
+  }
+  if (teamHasAura(defender.team, '卧龙') && defender.trait !== '卧龙') {
+    dmg *= 0.90;
+  }
+  dmg = Math.max(1, Math.round(dmg + rand(-3, 3)));
+  return { dmg, mult };
+}
+
+function calcDodgeRateEx(defender, attacker) {
+  let base = calcDodgeRate(defender, attacker);
+  const defTrait = defender.trait ? TRAITS[defender.trait] : null;
+  if (defTrait && defTrait.dodgeBonus) base += defTrait.dodgeBonus;
+  return Math.min(0.50, base);
+}
+
+function resolveOneAttack(atk, def, isCounter) {
+  const dodge = calcDodgeRateEx(def, atk);
+  const atkTrait = atk.trait ? TRAITS[atk.trait] : null;
+  const alwaysHit = isCounter && atkTrait && atkTrait.counterAlwaysHit;
+  if (!alwaysHit && dodge > 0 && Math.random() < dodge) {
+    return { dodged: true, dmg: 0 };
+  }
+  const r = calcDamage(atk, def, isCounter);
+  return { dodged: false, dmg: r.dmg, mult: r.mult };
+}
+
+function applySplash(attacker, target, mainDmg) {
+  if (attacker.trait !== '无双') return;
+  const targets = G.battle.units.filter(u =>
+    u.hp > 0 && u.team !== attacker.team && u !== target &&
+    Math.abs(u.x - target.x) + Math.abs(u.y - target.y) === 1
+  );
+  for (const t of targets) {
+    const splashDmg = Math.max(1, Math.round(mainDmg * 0.5));
+    t.hp -= splashDmg;
+    log('无双溅射：' + unitDisplayShort(t) + ' -' + splashDmg);
+    if (t.hp <= 0) { t.hp = 0; log(unitDisplayShort(t) + ' 被溅射击败'); }
+  }
+}
+
+function onKill(attacker) {
+  const atkTrait = attacker.trait ? TRAITS[attacker.trait] : null;
+  if (!atkTrait) return;
+  if (atkTrait.killHeal) {
+    const before = attacker.hp;
+    attacker.hp = Math.min(attacker.maxHp, attacker.hp + atkTrait.killHeal);
+    log(unitDisplayShort(attacker) + ' 触发【猛虎】，恢复 ' + (attacker.hp - before) + ' HP');
+  }
+  if (atkTrait.killAtkStack) {
+    attacker.killCount = (attacker.killCount || 0) + 1;
+    log(unitDisplayShort(attacker) + ' 触发【战意】，攻击 +' + (attacker.killCount * 5) + '%');
+  }
+}
+
+function doAttack(attacker, defender) {
+  if (!G.battle) return;
+  const result = resolveOneAttack(attacker, defender, false);
+  const atkHpBefore = attacker.hp;
+  const defHpBefore = defender.hp;
+  let counterResult = null;
+  if (defender.hp > 0 && inAttackRange(defender, attacker)) {
+    counterResult = resolveOneAttack(defender, attacker, true);
+  }
+  G.anim = {
+    type: 'battle', attacker, defender,
+    damage: result.dmg, dodged: result.dodged, mult: result.mult || 1,
+    attackerHpBefore: atkHpBefore,
+    defenderHpBefore: defHpBefore,
+    counter: counterResult,
+    phase: 'atk', t: 0,
+    done: () => {
+      if (!G.battle) return;
+      if (result.dodged) {
+        log(unitDisplayShort(defender) + ' 闪避了 ' + unitDisplayShort(attacker) + ' 的攻击');
+      } else {
+        defender.hp -= result.dmg;
+        const multText = (result.mult > 1) ? '（克制）' : (result.mult < 1) ? '（被克）' : '';
+        log(unitDisplayShort(attacker) + ' 对 ' + unitDisplayShort(defender) + ' 造成 ' + result.dmg + ' 伤害' + multText);
+        applySplash(attacker, defender, result.dmg);
+      }
+      if (defender.hp > 0 && counterResult) {
+        if (counterResult.dodged) {
+          log(unitDisplayShort(attacker) + ' 闪避了反击');
+        } else {
+          attacker.hp -= counterResult.dmg;
+          log(unitDisplayShort(defender) + ' 反击，造成 ' + counterResult.dmg + ' 伤害');
+        }
+      }
+      if (defender.hp <= 0) {
+        defender.hp = 0;
+        log(unitDisplayShort(defender) + ' 被击败');
+        onKill(attacker);
+      }
+      if (attacker.hp <= 0) { attacker.hp = 0; log(unitDisplayShort(attacker) + ' 阵亡'); }
+      attacker.hasAttacked = true;
+      if (checkBattleEnd()) return;
+      finishUnit(attacker);
+    }
+  };
+  mode = STATE.ANIM;
+}
+
+function finishUnit(u) {
+  if (!G.battle) return;
+  u.acted = true;
+  if (u.team === 'A') G.battle.anyActedThisTurn = true;
+  G.battle.selected = null;
+  G.battle.moveRange = [];
+  G.battle.phase = PHASE.SELECT;
+  G.battle.validTargets = [];
+  G.battle.showAttackRange = false;
+  hideCmdMenu(); hideUnitInfo(); hideHint();
+  if (u.team === 'B') {
+    const remaining = G.battle.units.filter(x => x.team === 'B' && x.hp > 0 && !x.acted);
+    if (remaining.length === 0) {
+      setTimeout(() => { if (G.battle) endTurn(); }, 300);
+    } else {
+      setTimeout(() => { if (G.battle) enemyAI(); }, 250);
+    }
+  }
+}
+
+function tryRetreat() {
+  const b = G.battle;
+  if (!b) return;
+  if (b.anyActedThisTurn) { showToast('本回合已有单位行动，无法撤退', 1200); return; }
+  const allies = b.units.filter(u => u.team === 'A' && u.hp > 0);
+  const foes = b.units.filter(u => u.team === 'B' && u.hp > 0);
+  if (!allies.length || !foes.length) return;
+  const avgAllySpd = allies.reduce((s, u) => s + u.spd, 0) / allies.length;
+  const avgFoeSpd = foes.reduce((s, u) => s + u.spd, 0) / foes.length;
+  let rate = 0.5 + (avgAllySpd - avgFoeSpd) * 0.05;
+  rate = clamp(rate, 0.2, 0.9);
+  const success = Math.random() < rate;
+  hideCmdMenu(); hideUnitInfo(); hideHint();
+  if (success) {
+    log('整体撤退成功（成功率 ' + Math.round(rate * 100) + '%）');
+    showToast('撤退成功！', 1000);
+    exitBattle(true, false);
+  } else {
+    log('整体撤退失败（成功率 ' + Math.round(rate * 100) + '%），本回合结束');
+    showToast('撤退失败！本回合结束', 1200);
+    endTurn();
+  }
+}
+
+/* ★ 战后结算 + 阵亡处理 + 金币掉落 */
+function exitBattle(byRetreat, wasWin) {
+  const b = G.battle;
+  if (!b) return;
+  const enemyRef = b.enemyRef;
+  const alliesAlive = b.units.filter(u => u.team === 'A' && u.hp > 0);
+  const alliesDead = b.units.filter(u => u.team === 'A' && u.hp <= 0);
+
+  // 收集结果信息
+  let resultRows = [];
+  let goldGain = 0;
+  let levelUpMsgs = [];
+  let deadMsgs = [];
+
+  if (wasWin) {
+    // 金币掉落
+    const foeCount = b.units.filter(u => u.team === 'B').length;
+    goldGain = 50 + Math.max(0, foeCount - 2) * 50;
+    if (enemyRef && enemyRef.isHistorical) goldGain += 100;
+    if (enemyRef && enemyRef.rank === '神将') goldGain += 500;
+    addGold(goldGain);
+
+    // 经验 + 升级
+    for (const u of alliesAlive) {
+      if (u.heroIdx === undefined) continue;
+      const hero = G.playerHeroes[u.heroIdx];
+      if (!hero) continue;
+      hero.exp = (hero.exp || 0) + 1;
+      let need = expNeeded(hero.level || 1);
+      while (hero.exp >= need && (hero.level || 1) < maxLevel()) {
+        hero.exp -= need;
+        hero.level = (hero.level || 1) + 1;
+        need = expNeeded(hero.level);
+        levelUpMsgs.push(heroPlainName(hero) + ' 升至 Lv.' + hero.level);
+      }
+      if ((hero.level || 1) >= maxLevel()) hero.exp = 0;
+    }
+    // 敌方历史武将冷却
+    if (enemyRef && enemyRef.isHistorical && enemyRef.heroName) {
+      markHeroCooldown(enemyRef.heroName);
+    }
+    // 俘虏判定
+    const foeMain = b.units.find(x => x.team === 'B' && x.id === 101);
+    if (foeMain && foeMain.isHistorical && foeMain.hp <= 0) {
+      const capRate = 0.05;
+      if (Math.random() < capRate) {
+        G.capturedHeroes.push({
+          heroName: foeMain.name, heroImg: foeMain.heroImg,
+          cls: foeMain.cls, isHistorical: true
+        });
+        resultRows.push('俘虏了 <span style="color:#ffdd55">★' + foeMain.name + '</span>');
+      }
+    }
+  }
+
+  // 处理我方所有参战武将的战后状态
+  for (const u of b.units.filter(x => x.team === 'A')) {
+    if (u.heroIdx === undefined) continue;
+    const hero = G.playerHeroes[u.heroIdx];
+    if (!hero) continue;
+    if (u.hp <= 0) {
+      // 阵亡
+      hero.dead = true;
+      hero.hp = 0;
+      deadMsgs.push(heroPlainName(hero));
+      // 从九宫格里移除
+      for (let k = 0; k < G.formation.length; k++) {
+        if (G.formation[k] === u.heroIdx) G.formation[k] = null;
+      }
+    } else {
+      // 存活：恢复 50% 最大 HP（至少 1）
+      const recovered = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.5));
+      hero.hp = Math.max(1, recovered);
+      hero.maxHp = u.maxHp;
+      hero.dead = false;
+    }
+  }
+
+  // 保存阵型（阵亡武将已被移除）
+  saveFormation();
+
+  // 关闭战斗
+  G.battle = null;
+  G.anim = null;
+  mode = STATE.MAP;
+  hideCmdMenu(); hideUnitInfo(); hideHint();
+  document.getElementById('btnEndTurn').style.display = 'none';
+  document.getElementById('btnBack').style.display = 'none';
+  document.getElementById('campBtn').style.display = 'block';
+  document.getElementById('infoLeft').textContent = '大地图';
+
+  if (byRetreat) {
+    let nearest = null, nd = 9999;
+    for (const e of G.enemies) {
+      const d = dist(e, G.player);
+      if (d < nd) { nd = d; nearest = e; }
+    }
+    if (nearest) {
+      const dx = G.player.x - nearest.x;
+      const dy = G.player.y - nearest.y;
+      const d = Math.hypot(dx, dy) || 1;
+      G.player.x = clamp(G.player.x + dx / d * 200, 20, MAP_W - 20);
+      G.player.y = clamp(G.player.y + dy / d * 200, 20, MAP_H - 20);
+      G.player.moving = false;
+      G.player.path = [];
+    }
+    G.player.invuln = 3;
+  }
+  if (wasWin && enemyRef) {
+    const idx = G.enemies.indexOf(enemyRef);
+    if (idx >= 0) G.enemies.splice(idx, 1);
+  }
+
+  // 显示结算界面
+  showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, resultRows);
+}
+
+function showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, extraRows) {
+  const titleEl = document.getElementById('resultTitle');
+  const contentEl = document.getElementById('resultContent');
+  titleEl.className = 'resultTitle';
+  if (byRetreat) {
+    titleEl.textContent = '撤 退 成 功';
+    titleEl.classList.add('retreat');
+  } else if (wasWin) {
+    titleEl.textContent = '战 斗 胜 利';
+    titleEl.classList.add('win');
+  } else {
+    titleEl.textContent = '战 斗 失 败';
+    titleEl.classList.add('lose');
+  }
+  let html = '';
+  if (wasWin) {
+    html += `<div class="resultRow"><span class="resultLabel">获得金币：</span><span class="resultGold">+${goldGain}</span></div>`;
+  }
+  if (extraRows && extraRows.length) {
+    for (const r of extraRows) {
+      html += `<div class="resultRow">${r}</div>`;
+    }
+  }
+  if (levelUpMsgs.length) {
+    html += `<div class="resultRow"><span class="resultLabel">升级：</span>`;
+    for (const m of levelUpMsgs) {
+      html += `<div class="levelUp">· ${m}</div>`;
+    }
+    html += `</div>`;
+  }
+  if (deadMsgs.length) {
+    html += `<div class="resultRow"><span class="resultLabel">阵亡：</span>`;
+    for (const m of deadMsgs) {
+      html += `<div class="deadHero">· ${m}（需要到医馆复活）</div>`;
+    }
+    html += `</div>`;
+  }
+  if (!html) html = '<div class="resultRow" style="text-align:center;color:#8a7a5a;">没有变化</div>';
+  contentEl.innerHTML = html;
+  document.getElementById('resultScreen').style.display = 'flex';
+}
+
+document.getElementById('resultOk').onclick = () => {
+  document.getElementById('resultScreen').style.display = 'none';
+};
+
+function checkBattleEnd() {
+  const b = G.battle;
+  if (!b) return false;
+  const aliveA = b.units.filter(u => u.team === 'A' && u.hp > 0).length;
+  const aliveB = b.units.filter(u => u.team === 'B' && u.hp > 0).length;
+  if (aliveA === 0 || aliveB === 0) {
+    const win = aliveB === 0;
+    log(win ? '战斗胜利！' : '战斗失败……');
+    exitBattle(false, win);
+    return true;
+  }
+  return false;
+}
+
+function animateMove(unit, path, done) {
+  G.anim = { type: 'move', unit, path, idx: 0, t: 0,
+    from: { x: unit.x, y: unit.y }, done };
+  mode = STATE.ANIM;
+}
+function updateAnim(dt) {
+  const a = G.anim;
+  if (!a) return;
+  if (a.type === 'move') {
+    a.t += dt * 6;
+    if (a.t >= 1) {
+      a.t = 0; a.idx++;
+      if (a.idx >= a.path.length) {
+        const d = a.done; G.anim = null;
+        mode = STATE.BATTLE;
+        d && d();
+        return;
+      }
+    }
+  } else if (a.type === 'battle') {
+    a.t += dt;
+    if (a.t > 2.0) {
+      const d = a.done; G.anim = null;
+      mode = G.battle ? STATE.BATTLE : STATE.MAP;
+      if (typeof d === 'function') d();
+    }
+  }
+}
+
+function drawAnim() {
+  const a = G.anim;
+  if (!a) return;
+  if (a.type === 'move') {
+    const node = a.path[a.idx];
+    const p = tileCenter(node.x, node.y);
+    ctx.strokeStyle = 'rgba(255,220,120,.7)';
+    ctx.lineWidth = 3; ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    const s = tileCenter(a.from.x, a.from.y);
+    ctx.moveTo(s.x, s.y);
+    for (let i = 0; i <= a.idx; i++) {
+      const c = tileCenter(a.path[i].x, a.path[i].y);
+      ctx.lineTo(c.x, c.y);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+    drawUnitSprite(ctx, a.unit.cls, a.unit.team, p.x - 24, p.y - 28, 48, true);
+  } else if (a.type === 'battle') {
+    const defWillSurvive = a.dodged || (a.defenderHpBefore - a.damage) > 0;
+    const dur = 2.0;
+    const t = a.t / dur;
+    const cx = W / 2, cy = H / 2;
+    const off = Math.min(140, W * 0.26);
+    const sz = 160;
+    let atkOffset = 0;
+    let defOffset = 0;
+    let defShake = 0;
+    let defFlash = 0;
+    let showDmg = false;
+    let showCounter = false;
+    let showMiss = false;
+
+    if (t < 0.20) {
+      atkOffset = off * (t / 0.20) * 0.75;
+    } else if (t < 0.35) {
+      atkOffset = off * 0.75;
+      defShake = Math.sin((t - 0.20) * 80) * 10;
+      defFlash = 1 - (t - 0.20) / 0.15;
+      showDmg = true;
+    } else if (t < 0.55) {
+      const k = (t - 0.35) / 0.20;
+      atkOffset = off * 0.75 * (1 - k);
+      defShake = Math.sin((t - 0.35) * 30) * 4 * (1 - k);
+      showDmg = true;
+    } else if (t < 0.75) {
+      atkOffset = 0;
+      showDmg = true;
+      if (a.counter && !a.counter.dodged && defWillSurvive) {
+        const k = (t - 0.55) / 0.20;
+        defOffset = -off * k * 0.75;
+        showCounter = k > 0.4;
+      } else if (a.counter && a.counter.dodged) {
+        showMiss = true;
+      }
+    } else {
+      if (a.counter && !a.counter.dodged && defWillSurvive) {
+        defOffset = -off * 0.75 * (1 - (t - 0.75) / 0.25);
+        showCounter = true;
+      }
+      showDmg = true;
+      if (a.dodged) showMiss = true;
+    }
+
+    ctx.fillStyle = 'rgba(0,0,0,.88)';
+    ctx.fillRect(0, 0, W, H);
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.5);
+    grad.addColorStop(0, 'rgba(120,60,20,.5)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    if (atkOffset > 20) {
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      for (let i = 1; i <= 3; i++) {
+        const backX = cx - off - sz/2 + atkOffset * (1 - i * 0.15);
+        const img = getCachedImage(a.attacker.heroImg);
+        if (img && img.complete) ctx.drawImage(img, backX, cy - sz/2, sz, sz);
+      }
+      ctx.restore();
+    }
+
+    const atkX = cx - off - sz/2 + atkOffset;
+    {
+      const img = getCachedImage(a.attacker.heroImg);
+      if (img && img.complete) ctx.drawImage(img, atkX, cy - sz/2, sz, sz);
+      else drawUnitSprite(ctx, a.attacker.cls, a.attacker.team, atkX, cy - sz/2, sz, false);
+    }
+    const defX = cx + off - sz/2 + defShake + defOffset;
+    {
+      const img = getCachedImage(a.defender.heroImg);
+      if (img && img.complete) ctx.drawImage(img, defX, cy - sz/2, sz, sz);
+      else drawUnitSprite(ctx, a.defender.cls, a.defender.team, defX, cy - sz/2, sz, false);
+    }
+
+    if (defFlash > 0) {
+      ctx.save();
+      ctx.globalAlpha = defFlash * 0.6;
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(cx + off, cy, sz * 0.45, 0, 7);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (showDmg && !a.dodged && t < 0.55) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,200,.9)';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      const slashX = cx + off - 20;
+      const slashY = cy - 30;
+      ctx.moveTo(slashX - 30, slashY - 30);
+      ctx.lineTo(slashX + 30, slashY + 30);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(slashX + 30, slashY - 30);
+      ctx.lineTo(slashX - 30, slashY + 30);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = RANK_COLOR[a.attacker.rank] || '#e8dcc8';
+    ctx.fillText(unitDisplayShort(a.attacker), cx - off, cy - sz/2 - 60);
+    ctx.fillStyle = RANK_COLOR[a.defender.rank] || '#e8dcc8';
+    ctx.fillText(unitDisplayShort(a.defender), cx + off, cy - sz/2 - 60);
+
+    const barW = 160;
+    let atkHpShow = a.attacker.hp;
+    if (t >= 0.55 && a.counter && !a.counter.dodged && defWillSurvive) {
+      atkHpShow = Math.max(0, a.attackerHpBefore - a.counter.dmg);
+    }
+    let defHpShow = a.defenderHpBefore;
+    if (!a.dodged && t >= 0.20) {
+      defHpShow = Math.max(0, a.defenderHpBefore - a.damage);
+    }
+    drawBattleHpBar(cx - off, cy - sz/2 - 48, barW, a.attacker, a.attackerHpBefore, atkHpShow);
+    drawBattleHpBar(cx + off, cy - sz/2 - 48, barW, a.defender, a.defenderHpBefore, defHpShow);
+
+    if (showDmg && !a.dodged) {
+      const age = Math.max(0, (t - 0.20) * dur);
+      const rise = Math.min(70, age * 180);
+      const alpha = Math.max(0, 1 - age * 1.2);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 56px sans-serif';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 6;
+      ctx.fillStyle = '#ff5555';
+      const dmgText = '-' + a.damage;
+      ctx.strokeText(dmgText, cx + off, cy + 20 - rise);
+      ctx.fillText(dmgText, cx + off, cy + 20 - rise);
+      ctx.restore();
+    }
+
+    if (showCounter && a.counter && !a.counter.dodged && defWillSurvive) {
+      const age = Math.max(0, (t - 0.55) * dur);
+      const rise = Math.min(70, age * 180);
+      const alpha = Math.max(0, 1 - age * 1.2);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 48px sans-serif';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 5;
+      ctx.fillStyle = '#ffaa2a';
+      const cText = '反击 -' + a.counter.dmg;
+      ctx.strokeText(cText, cx - off, cy + 20 - rise);
+      ctx.fillText(cText, cx - off, cy + 20 - rise);
+      ctx.restore();
+    }
+
+    if (showMiss || a.dodged) {
+      const age = Math.max(0, (t - 0.20) * dur);
+      const alpha = Math.max(0.4, 1 - age * 0.5);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 64px sans-serif';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 6;
+      ctx.fillStyle = '#4caf50';
+      ctx.strokeText('MISS', cx + off, cy + 20);
+      ctx.fillText('MISS', cx + off, cy + 20);
+      ctx.restore();
+    }
+
+    if (!a.dodged && a.mult && a.mult !== 1) {
+      if (a.mult > 1) {
+        ctx.fillStyle = '#ff8a3a'; ctx.font = 'bold 16px sans-serif';
+        ctx.fillText('克制 ×' + a.mult, cx, cy - sz/2 - 80);
+      } else if (a.mult < 1) {
+        ctx.fillStyle = '#888'; ctx.font = 'bold 16px sans-serif';
+        ctx.fillText('被克 ×' + a.mult, cx, cy - sz/2 - 80);
+      }
+    }
+
+    if (a.attacker.trait && TRAITS[a.attacker.trait]) {
+      ctx.fillStyle = '#ffaa2a'; ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('【' + TRAITS[a.attacker.trait].name + '】', cx - off, cy + sz/2 + 20);
+    }
+    if (a.defender.trait && TRAITS[a.defender.trait]) {
+      ctx.fillStyle = '#ffaa2a'; ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('【' + TRAITS[a.defender.trait].name + '】', cx + off, cy + sz/2 + 20);
+    }
+
+    ctx.fillStyle = '#c9a96a'; ctx.font = '14px sans-serif';
+    ctx.fillText('点击任意处继续', cx, H - 60);
+  }
+}
+
+function drawBattleHpBar(cx, y, w, unit, hpBefore, hpNow) {
+  const h = 14;
+  const x = cx - w / 2;
+  ctx.fillStyle = '#300';
+  ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+  ctx.fillStyle = '#111';
+  ctx.fillRect(x, y, w, h);
+  const ratioNow = Math.max(0, hpNow / unit.maxHp);
+  ctx.fillStyle = unit.team === 'A' ? '#4caf50' : '#e74c3c';
+  ctx.fillRect(x, y, w * ratioNow, h);
+  if (hpBefore > hpNow) {
+    const ratioBefore = hpBefore / unit.maxHp;
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.fillRect(x + w * ratioNow, y, w * (ratioBefore - ratioNow), h);
+  }
+  ctx.strokeStyle = '#c9a96a';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(hpNow + '/' + unit.maxHp, cx, y + h - 3);
+}
+
+function endTurn() {
+  const b = G.battle;
+  if (!b) return;
+  if (b.turn === 'A') {
+    b.turn = 'B';
+    b.anyActedThisTurn = false;
+    b.units.forEach(u => { if (u.team === 'B') { u.acted = false; u.hasAttacked = false; } });
+    document.getElementById('infoLeft').textContent = '战斗 · 敌方回合';
+    hideCmdMenu(); hideUnitInfo(); hideHint();
+    setTimeout(enemyAI, 300);
+  } else {
+    b.turn = 'A';
+    b.round++;
+    b.anyActedThisTurn = false;
+    b.units.forEach(u => { if (u.team === 'A') { u.acted = false; u.hasAttacked = false; } });
+    b.selected = null;
+    b.phase = PHASE.SELECT;
+    hideCmdMenu(); hideUnitInfo(); hideHint();
+    document.getElementById('infoLeft').textContent = '战斗 · 第' + b.round + '回合';
+  }
+}
+
+function enemyAI() {
+  const b = G.battle;
+  if (!b) return;
+  if (b.turn !== 'B') return;
+  const foes = b.units.filter(u => u.team === 'B' && u.hp > 0 && !u.acted);
+  if (!foes.length) { endTurn(); return; }
+  const foe = foes[0];
+  const allies = b.units.filter(u => u.team === 'A' && u.hp > 0);
+  if (!allies.length) { endTurn(); return; }
+  let target = null;
+  const attackable = allies.filter(a => inAttackRange(foe, a));
+  if (attackable.length) target = attackable[0];
+  else {
+    let best = 999;
+    for (const a of allies) {
+      const d = manhattan(a, foe);
+      if (d < best) { best = d; target = a; }
+    }
+  }
+  if (inAttackRange(foe, target)) { doAttack(foe, target); return; }
+  const range = computeMoveRange(foe);
+  if (!range.length) { finishUnit(foe); return; }
+  let bestTile = null, bestScore = -999;
+  for (const t of range) {
+    const testPos = { x: t.x, y: t.y };
+    let score;
+    if (inAttackRange(testPos, target)) score = 100 - manhattan(testPos, target);
+    else score = -manhattan(testPos, target);
+    if (score > bestScore) { bestScore = score; bestTile = t; }
+  }
+  if (!bestTile) bestTile = range[0];
+  const path = findPath(foe, bestTile.x, bestTile.y);
+  if (!path.length) { finishUnit(foe); return; }
+  const moveDist = path.length;
+  animateMove(foe, path, () => {
+    if (!G.battle) return;
+    foe.x = bestTile.x; foe.y = bestTile.y;
+    foe.movedDist = moveDist;
+    const adj = getAttackableTargets(foe)[0];
+    if (adj) doAttack(foe, adj);
+    else finishUnit(foe);
+  });
+}
+
+function drawBattle() {
+  const b = G.battle;
+  if (!b) return;
+  ctx.fillStyle = '#2a3a28';
+  ctx.fillRect(0, 0, W, H);
+  const ox = (W - BCOLS * TILE) / 2;
+  const oy = (H - BROWS * TILE) / 2;
+  for (let y = 0; y < BROWS; y++) {
+    for (let x = 0; x < BCOLS; x++) {
+      const px = ox + x * TILE, py = oy + y * TILE;
+      ctx.fillStyle = (x + y) % 2 ? '#2e3a2e' : '#344434';
+      ctx.fillRect(px, py, TILE, TILE);
+      ctx.strokeStyle = 'rgba(0,0,0,.3)';
+      ctx.strokeRect(px, py, TILE, TILE);
+    }
+  }
+  if (b.phase === PHASE.MOVE) {
+    for (const m of b.moveRange) {
+      const c = tileCenter(m.x, m.y);
+      ctx.fillStyle = 'rgba(90,180,120,.35)';
+      ctx.fillRect(c.x - TILE/2, c.y - TILE/2, TILE, TILE);
+    }
+  }
+  if (b.phase === PHASE.TARGET && b.selected) {
+    const tiles = getRangeTiles(b.selected);
+    for (const t of tiles) {
+      const c = tileCenter(t.x, t.y);
+      ctx.fillStyle = 'rgba(255,120,60,.2)';
+      ctx.fillRect(c.x - TILE/2, c.y - TILE/2, TILE, TILE);
+      ctx.strokeStyle = 'rgba(255,140,60,.6)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(c.x - TILE/2 + 1, c.y - TILE/2 + 1, TILE - 2, TILE - 2);
+    }
+    for (const t of b.validTargets) {
+      const c = tileCenter(t.x, t.y);
+      ctx.fillStyle = 'rgba(255,60,60,' + (0.25 + 0.25 * Math.sin(Date.now() / 150)) + ')';
+      ctx.fillRect(c.x - TILE/2, c.y - TILE/2, TILE, TILE);
+      ctx.strokeStyle = '#ff4444'; ctx.lineWidth = 4;
+      ctx.strokeRect(c.x - TILE/2 + 2, c.y - TILE/2 + 2, TILE - 4, TILE - 4);
+    }
+  }
+  if (b.selected) {
+    const c = tileCenter(b.selected.x, b.selected.y);
+    ctx.strokeStyle = '#ffdd55'; ctx.lineWidth = 3;
+    ctx.strokeRect(c.x - TILE/2 + 1, c.y - TILE/2 + 1, TILE - 2, TILE - 2);
+  }
+    const unitSz = Math.round(TILE * 0.9);
+  const unitSzHalf = unitSz / 2;
+  for (const u of b.units) {
+    if (u.hp <= 0) continue;
+    const c = tileCenter(u.x, u.y);
+    const color = RANK_COLOR[u.rank] || '#888';
+    ctx.beginPath();
+    ctx.arc(c.x, c.y - 6, unitSzHalf + 2, 0, 7);
+    ctx.fillStyle = color + '44';
+    ctx.fill();
+    if (u.acted && u.team === 'A') ctx.globalAlpha = 0.45;
+    drawUnitSprite(ctx, u.cls, u.team, c.x - unitSzHalf, c.y - unitSzHalf - 6, unitSz, true);
+    ctx.globalAlpha = 1;
+    const w = Math.round(TILE * 0.7), h = 4;
+    const hpY = c.y + unitSzHalf + 2;
+    ctx.fillStyle = '#300';
+    ctx.fillRect(c.x - w/2, hpY, w, h);
+    ctx.fillStyle = u.team === 'A' ? '#4caf50' : '#e74c3c';
+    ctx.fillRect(c.x - w/2, hpY, w * (u.hp / u.maxHp), h);
+    ctx.fillStyle = color;
+    ctx.font = Math.round(TILE * 0.22) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(unitDisplayShort(u), c.x, hpY + 14);
+  }
+}
+
+function showUnitInfo(u) {
+  let html = '';
+  if (u.heroImg) html += '<img class="heroHead" src="' + u.heroImg + '">';
+  const color = RANK_COLOR[u.rank] || '#e8dcc8';
+  const star = u.isHistorical ? '★' : '';
+  html += '<div class="name" style="color:' + color + '">' + star + u.name + '</div>';
+  html += '<div class="lvl">【' + (u.rank || '?') + '】 Lv.' + (u.level || 1) + '</div>';
+  html += '<div class="cls">' + (u.cls || '') + '</div>';
+  html += 'HP: <span class="' + (u.team === 'A' ? 'hp' : 'foe') + '">' + u.hp + '/' + u.maxHp + '</span><br>';
+  html += '攻击: ' + u.atk + '　防御: ' + u.def + '<br>';
+  html += '移动: ' + u.mov + '　射程: ' + u.range + '<br>';
+  html += '速度: ' + u.spd;
+  if (u.trait && TRAITS[u.trait]) {
+    const tr = TRAITS[u.trait];
+    html += '<div class="trait"><span class="traitName">【' + tr.name + '】</span>' + tr.desc + '</div>';
+  }
+  unitInfo.innerHTML = html;
+  unitInfo.style.display = 'block';
+}
+function hideUnitInfo() { unitInfo.style.display = 'none'; }
+
+/* ======================== 城池系统 ======================== */
+
+let selectedBenchHero = null;
+const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+/* 生成酒馆 6 个随机武将 */
+function rollTavernHeroes() {
+  const result = [];
+  const usedNames = new Set();
+  for (let i = 0; i < 6; i++) {
+    let h = null;
+    for (let tries = 0; tries < 20; tries++) {
+      const t = createRandomHero();
+      if (!usedNames.has(t.heroName)) {
+        usedNames.add(t.heroName);
+        h = t;
+        break;
+      }
+    }
+    if (!h) h = createRandomHero();
+    const s = calcHeroStats(h);
+    result.push({
+      hero: h,
+      stats: s,
+      price: RANK_RECRUIT_PRICE[s.rank],
+      sold: false,
+    });
+  }
+  return result;
+}
+
+function enterCity(city) {
+  G.inCity = city;
+  document.getElementById('cityName').textContent = city.name;
+  document.getElementById('cityFaction').textContent = city.faction;
+  if (!G.cityTavern || G.cityTavern.city !== city) {
+    G.cityTavern = { city: city, heroes: rollTavernHeroes() };
+  }
+  showCityMenu();
+  document.getElementById('cityScreen').style.display = 'flex';
+}
+
+function leaveCity() {
+  document.getElementById('cityScreen').style.display = 'none';
+  G.inCity = null;
+}
+
+function showCityMenu() {
+  document.getElementById('cityMenu').style.display = 'flex';
+  document.getElementById('cityPanel').classList.remove('active');
+}
+
+function openCityPanel(tab) {
+  document.getElementById('cityMenu').style.display = 'none';
+  const panel = document.getElementById('cityPanel');
+  panel.classList.add('active');
+  const titleEl = document.getElementById('cityPanelTitle');
+  const contentEl = document.getElementById('cityPanelContent');
+  if (tab === 'tavern') {
+    titleEl.textContent = '酒 馆';
+    renderTavern(contentEl);
+  } else if (tab === 'hospital') {
+    titleEl.textContent = '医 馆';
+    renderHospital(contentEl);
+  } else if (tab === 'shop') {
+    titleEl.textContent = '商 店';
+    renderShop(contentEl);
+  }
+}
+
+function renderTavern(container) {
+  container.innerHTML = '';
+  if (!G.cityTavern) {
+    container.innerHTML = '<div class="emptyShop">暂 无 可 招 募 的 武 将</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'shopGrid';
+  for (let i = 0; i < G.cityTavern.heroes.length; i++) {
+    const t = G.cityTavern.heroes[i];
+    const h = t.hero;
+    const s = t.stats;
+    const color = RANK_COLOR[s.rank];
+    const trait = getHeroTrait(h);
+    const traitHtml = trait ? `<div class="traitBox">【${trait.name}】</div>` : '';
+    const canAfford = G.gold >= t.price && !t.sold;
+    const card = document.createElement('div');
+    card.className = 'shopCard';
+    card.style.borderColor = color;
+    if (t.sold) card.style.opacity = 0.4;
+    card.innerHTML = `
+      <img class="head" src="${h.heroImg || ''}" alt="" style="border-color:${color}">
+      <div class="info">
+        <div class="name" style="color:${color}">${h.heroName}</div>
+        <div class="cls">【${s.rank}】${h.cls}</div>
+        <div class="stat">HP: ${s.hp}　攻: ${s.atk}</div>
+        <div class="stat">防: ${s.def}　速: ${s.spd}</div>
+        ${traitHtml}
+        <div class="price">💰 ${t.price}</div>
+        ${t.sold
+          ? '<div class="soldTag">已 招 募</div>'
+          : `<button class="buyBtn" data-idx="${i}" ${canAfford ? '' : 'disabled'}>招 募</button>`
+        }
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  container.appendChild(grid);
+  const refreshBar = document.createElement('div');
+  refreshBar.className = 'refreshBar';
+  refreshBar.innerHTML = `
+    <span style="color:#8a7a5a;font-size:13px;">酒馆刷新需 50 金</span>
+    <button class="saveBtn" id="tavernRefreshBtn" ${G.gold >= 50 ? '' : 'disabled'}>刷 新（50 金）</button>
+  `;
+  container.appendChild(refreshBar);
+
+  container.querySelectorAll('.buyBtn').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.idx);
+      const t = G.cityTavern.heroes[idx];
+      if (t.sold) return;
+      if (G.gold < t.price) {
+        showToast('金币不足', 1000);
+        return;
+      }
+      G.gold -= t.price;
+      updateGoldUI();
+      t.sold = true;
+      G.playerHeroes.push(t.hero);
+      log('招募了 ' + heroPlainName(t.hero) + '（花费 ' + t.price + ' 金）');
+      showToast('招募了 ' + t.hero.heroName, 1200);
+      renderTavern(container);
+    };
+  });
+  const refreshBtn = document.getElementById('tavernRefreshBtn');
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      if (G.gold < 50) return;
+      G.gold -= 50;
+      updateGoldUI();
+      G.cityTavern = { city: G.cityTavern.city, heroes: rollTavernHeroes() };
+      log('刷新了酒馆（-50 金）');
+      renderTavern(container);
+    };
+  }
+}
+
+function renderHospital(container) {
+  container.innerHTML = '';
+  if (!G.playerHeroes.length) {
+    container.innerHTML = '<div class="emptyShop">暂 无 武 将</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'shopGrid';
+  for (let i = 0; i < G.playerHeroes.length; i++) {
+    const h = G.playerHeroes[i];
+    const s = calcHeroStats(h);
+    const color = RANK_COLOR[s.rank];
+    const curHp = (h.hp !== null && h.hp !== undefined) ? h.hp : s.hp;
+    const maxHp = s.hp;
+    const isDead = h.dead;
+    let actionHtml = '';
+    let price = 0;
+    if (isDead) {
+      price = RANK_REVIVE_PRICE[s.rank];
+      actionHtml = `<button class="buyBtn" data-revive="${i}" ${G.gold >= price ? '' : 'disabled'}>复 活（${price} 金）</button>`;
+    } else if (curHp < maxHp) {
+      price = maxHp - curHp;
+      actionHtml = `<button class="buyBtn" data-heal="${i}" ${G.gold >= price ? '' : 'disabled'}>治 疗（${price} 金）</button>`;
+    } else {
+      actionHtml = `<div class="soldTag" style="color:#4caf50;">满 血</div>`;
+    }
+    const hpColor = isDead ? '#ff8080' : (curHp < maxHp ? '#ffaa2a' : '#4caf50');
+    const card = document.createElement('div');
+    card.className = 'shopCard';
+    card.style.borderColor = isDead ? '#666' : color;
+    if (isDead) card.style.opacity = 0.7;
+    card.innerHTML = `
+      <img class="head" src="${h.heroImg || ''}" alt="" style="border-color:${isDead ? '#666' : color}">
+      <div class="info">
+        <div class="name" style="color:${isDead ? '#888' : color}">${h.isHistorical ? '★' : ''}${h.heroName}</div>
+        <div class="cls">【${s.rank}】${h.cls}</div>
+        <div class="stat">HP: <span style="color:${hpColor}">${curHp} / ${maxHp}</span></div>
+        ${isDead ? '<div class="stat" style="color:#ff8080;">已 阵 亡</div>' : ''}
+        ${actionHtml}
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  container.appendChild(grid);
+
+  container.querySelectorAll('button[data-heal]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.heal);
+      const h = G.playerHeroes[idx];
+      const s = calcHeroStats(h);
+      const curHp = (h.hp !== null && h.hp !== undefined) ? h.hp : s.hp;
+      const price = s.hp - curHp;
+      if (G.gold < price) return;
+      G.gold -= price;
+      updateGoldUI();
+      h.hp = s.hp;
+      h.maxHp = s.hp;
+      log(heroPlainName(h) + ' 治疗完毕（-' + price + ' 金）');
+      showToast(h.heroName + ' 已恢复满血', 1200);
+      renderHospital(container);
+    };
+  });
+  container.querySelectorAll('button[data-revive]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.revive);
+      const h = G.playerHeroes[idx];
+      const s = calcHeroStats(h);
+      const price = RANK_REVIVE_PRICE[s.rank];
+      if (G.gold < price) return;
+      G.gold -= price;
+      updateGoldUI();
+      h.dead = false;
+      h.hp = s.hp;
+      h.maxHp = s.hp;
+      log(heroPlainName(h) + ' 复活（-' + price + ' 金）');
+      showToast(h.heroName + ' 已复活', 1200);
+      renderHospital(container);
+    };
+  });
+}
+
+function renderShop(container) {
+  container.innerHTML = '<div class="emptyShop">🛒<br><br>商 店 暂 未 开 放<br><br>（装 备 系 统 将 在 后 续 版 本 加 入）</div>';
+}
+
+document.getElementById('enterCityBtn').onclick = () => {
+  if (G.currentCity) enterCity(G.currentCity);
+};
+document.getElementById('cityLeave').onclick = leaveCity;
+document.getElementById('cityPanelBack').onclick = showCityMenu;
+document.querySelectorAll('.cityMenuBtn').forEach(btn => {
+  btn.onclick = () => openCityPanel(btn.dataset.city);
+});
+
+/* ======================== 营地界面 ======================== */
+
+let currentCampTab = 'heroes';
+
+function openCamp() {
+  if (mode !== STATE.MAP) return;
+  document.getElementById('campScreen').style.display = 'flex';
+  switchCampTab(currentCampTab);
+}
+function closeCamp() {
+  document.getElementById('campScreen').style.display = 'none';
+}
+function switchCampTab(tab) {
+  currentCampTab = tab;
+  document.querySelectorAll('.campTab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  const panel = document.getElementById('campPanel');
+  panel.innerHTML = '';
+  if (tab === 'heroes') renderHeroesTab(panel);
+  else if (tab === 'captives') renderCaptivesTab(panel);
+  else if (tab === 'formation') renderFormationTab(panel);
+  else if (tab === 'inventory') renderInventoryTab(panel);
+  else if (tab === 'save') renderSaveTab(panel);
+}
+
+function renderHeroesTab(panel) {
+  if (!G.playerHeroes.length) {
+    panel.innerHTML = '<div style="color:#8a7a5a">还没有武将。</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'heroGrid';
+  for (const h of G.playerHeroes) {
+    const s = calcHeroStats(h);
+    const color = RANK_COLOR[s.rank];
+    const star = h.isHistorical ? '★' : '';
+    const g = getHeroGrowth(h);
+    const score = calcGrowthScore(g).toFixed(1);
+    const need = expNeeded(h.level || 1);
+    const expText = (h.level || 1) >= maxLevel() ? 'MAX' : ((h.exp || 0) + '/' + need);
+    const trait = getHeroTrait(h);
+    const traitHtml = trait
+      ? `<div class="traitBox"><span class="traitName">【${trait.name}】</span>${trait.desc}</div>`
+      : '';
+    const curHp = h.dead ? 0 : ((h.hp !== null && h.hp !== undefined) ? h.hp : s.hp);
+    const isDead = h.dead;
+    const card = document.createElement('div');
+    card.className = 'heroCard' + (isDead ? ' dead' : '');
+    card.style.borderColor = isDead ? '#666' : color;
+    card.innerHTML = `
+      <img class="head" src="${h.heroImg || ''}" alt="" style="border-color:${isDead ? '#666' : color}">
+      <div class="info">
+        <div class="name" style="color:${isDead ? '#888' : color}">${star}${h.heroName}</div>
+        <div class="cls">【${s.rank}】${h.cls}${h.isHistorical ? ' · 名将' : ''}
+          ${isDead ? '<span class="deadTag">阵亡</span>' : ''}
+        </div>
+        <div class="stat">Lv.${h.level || 1}　经验: ${expText}</div>
+        <div class="stat">HP: <span>${curHp}/${s.hp}</span></div>
+        <div class="stat">攻: <span>${s.atk}</span>　防: <span>${s.def}</span></div>
+        <div class="stat">移动: <span>${s.mov}</span>　射程: <span>${s.range}</span></div>
+        <div class="stat">速度: <span>${s.spd}</span></div>
+        <div class="stat" style="color:#c9a96a;border-top:1px dashed #6b5333;margin-top:6px;padding-top:6px;">
+          成长: 攻${g.atk.toFixed(1)} 防${g.def.toFixed(1)} 血${g.hp.toFixed(1)} 速${g.spd.toFixed(2)}
+        </div>
+        <div class="stat" style="color:#8a7a5a;font-size:11px;">评分 ${score}（${s.rank}档）</div>
+        ${traitHtml}
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  panel.appendChild(grid);
+}
+
+function renderCaptivesTab(panel) {
+  if (!G.capturedHeroes.length) {
+    panel.innerHTML = '<div style="color:#8a7a5a">暂无俘虏。</div>';
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'heroGrid';
+  for (let i = 0; i < G.capturedHeroes.length; i++) {
+    const c = G.capturedHeroes[i];
+    const card = document.createElement('div');
+    card.className = 'capCard';
+    const star = c.isHistorical ? '★' : '';
+    card.innerHTML = `
+      <img class="head" src="${c.heroImg || ''}" alt="">
+      <div class="info">
+        <div class="name">${star}${c.heroName}</div>
+        <div class="cls">${c.cls || ''}</div>
+      </div>
+      <div class="btns">
+        <button data-release="${i}">释 放</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  panel.appendChild(grid);
+  panel.querySelectorAll('button[data-release]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.release);
+      const name = G.capturedHeroes[idx].heroName;
+      G.capturedHeroes.splice(idx, 1);
+      log('释放了 ' + name);
+      renderCaptivesTab(panel);
+    };
+  });
+}
+
+function renderFormationTab(panel) {
+  panel.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'formationWrap';
+  const left = document.createElement('div');
+  left.className = 'formationLeft';
+  left.innerHTML = `<div class="formationTitle">九 宫 格（左侧 = 前排，右侧 = 后排）</div>`;
+  const grid = document.createElement('div');
+  grid.className = 'grid9';
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.cell = i;
+    updateCellDisplay(cell, i);
+    setupCellEvents(cell, i);
+    grid.appendChild(cell);
+  }
+  left.appendChild(grid);
+  const hintText = '· 拖拽头像到九宫格部署，或点击武将再点格子<br>· 点击已放置的格子可撤下<br>· 最多上场 6 人<br>· 格子位置决定战场初始站位<br>· 阵亡武将不能上场，需到医馆复活';
+  left.insertAdjacentHTML('beforeend', `
+    <div class="formationHint">${hintText}</div>
+    <button class="saveBtn" id="saveFormationBtn">保 存 布 阵</button>
+  `);
+  const right = document.createElement('div');
+  right.className = 'formationRight';
+  right.innerHTML = `<div class="formationTitle">武 将 池（拖 拽 或 点 击）</div>`;
+  const bench = document.createElement('div');
+  bench.className = 'benchList';
+  for (let i = 0; i < G.playerHeroes.length; i++) {
+    const h = G.playerHeroes[i];
+    const s = calcHeroStats(h);
+    const color = RANK_COLOR[s.rank];
+    const inGrid = G.formation.includes(i);
+    const isDead = h.dead;
+    const isSelected = isTouch && selectedBenchHero === i;
+    const item = document.createElement('div');
+    item.className = 'benchHero' + (inGrid ? ' inGrid' : '') + (isDead ? ' dead' : '') + (isSelected ? ' selected' : '');
+    item.draggable = !inGrid && !isDead;
+    item.dataset.heroIdx = i;
+    const star = h.isHistorical ? '★' : '';
+    item.innerHTML = `
+      <img src="${h.heroImg || ''}" alt="" style="border-color:${isDead ? '#666' : color}">
+      <div class="info">
+        <div class="name" style="color:${isDead ? '#888' : color}">${star}${h.heroName}${isDead ? '（阵亡）' : ''}</div>
+        <div class="cls">【${s.rank}】${h.cls} Lv.${h.level || 1}</div>
+      </div>
+    `;
+    if (!isDead) setupBenchDrag(item, i);
+    bench.appendChild(item);
+  }
+  right.appendChild(bench);
+  wrap.appendChild(left);
+  wrap.appendChild(right);
+  panel.appendChild(wrap);
+  document.getElementById('saveFormationBtn').onclick = () => {
+    saveFormation();
+    showToast('布阵已保存', 1000);
+  };
+}
+
+function saveFormation() {
+  try { localStorage.setItem('sanguo_formation', JSON.stringify(G.formation)); }
+  catch (e) { console.warn(e); }
+}
+function loadFormation() {
+  try {
+    const s = localStorage.getItem('sanguo_formation');
+    if (s) G.formation = JSON.parse(s);
+  } catch (e) { console.warn(e); }
+}
+
+function updateCellDisplay(cell, idx) {
+  const heroIdx = G.formation[idx];
+  const showHintForTouch = isTouch && selectedBenchHero !== null && (heroIdx === null || heroIdx === undefined);
+  if (heroIdx === null || heroIdx === undefined || heroIdx >= G.playerHeroes.length) {
+    cell.classList.remove('filled');
+    cell.style.borderColor = showHintForTouch ? '#ffdd55' : '';
+    cell.innerHTML = `<div class="posLabel">${idx + 1}</div>` +
+      (showHintForTouch ? '<div style="font-size:18px;color:#ffdd55;">+</div>' : '');
+    return;
+  }
+  const h = G.playerHeroes[heroIdx];
+  const s = calcHeroStats(h);
+  const color = RANK_COLOR[s.rank];
+  cell.classList.add('filled');
+  cell.style.borderColor = color;
+  const star = h.isHistorical ? '★' : '';
+  cell.innerHTML = `
+    <div class="posLabel">${idx + 1}</div>
+    <img src="${h.heroImg || ''}" alt="" style="border:2px solid ${color}">
+    <div class="cellName" style="color:${color}">${star}${h.heroName}</div>
+  `;
+}
+
+function handleDropHeroToCell(hIdx, cellIdx) {
+  if (hIdx === null || hIdx === undefined) return;
+  if (G.playerHeroes[hIdx] && G.playerHeroes[hIdx].dead) {
+    showToast('阵亡武将不能上场', 1200);
+    return;
+  }
+  // 如果这个武将已经在别的格子里，先移除
+  for (let i = 0; i < G.formation.length; i++) {
+    if (G.formation[i] === hIdx) G.formation[i] = null;
+  }
+  const currentDeployed = new Set(G.formation.filter(x => x !== null));
+  if (!currentDeployed.has(hIdx) && currentDeployed.size >= MAX_HEROES) {
+    showToast('最多上场 ' + MAX_HEROES + ' 人', 1200);
+    return;
+  }
+  G.formation[cellIdx] = hIdx;
+}
+
+function setupCellEvents(cell, idx) {
+  cell.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    cell.classList.add('dragOver');
+  });
+  cell.addEventListener('dragleave', () => {
+    cell.classList.remove('dragOver');
+  });
+  cell.addEventListener('drop', (e) => {
+    e.preventDefault();
+    cell.classList.remove('dragOver');
+    const fromHeroIdx = e.dataTransfer.getData('heroIdx');
+    const fromCell = e.dataTransfer.getData('fromCell');
+    if (fromHeroIdx !== '' && fromHeroIdx !== null) {
+      const hIdx = parseInt(fromHeroIdx);
+      handleDropHeroToCell(hIdx, idx);
+      refreshFormationTab();
+    } else if (fromCell !== '' && fromCell !== null) {
+      const from = parseInt(fromCell);
+      if (from === idx) return;
+      const tmp = G.formation[idx];
+      G.formation[idx] = G.formation[from];
+      G.formation[from] = tmp;
+      refreshFormationTab();
+    }
+  });
+  cell.addEventListener('dragstart', (e) => {
+    const hIdx = G.formation[idx];
+    if (hIdx === null || hIdx === undefined) { e.preventDefault(); return; }
+    e.dataTransfer.setData('fromCell', String(idx));
+    e.dataTransfer.setData('heroIdx', '');
+  });
+
+  // 手机：点击格子
+  cell.addEventListener('click', () => {
+    const curHeroIdx = G.formation[idx];
+    if (selectedBenchHero !== null) {
+      handleDropHeroToCell(selectedBenchHero, idx);
+      selectedBenchHero = null;
+      refreshFormationTab();
+      return;
+    }
+    if (curHeroIdx !== null && curHeroIdx !== undefined) {
+      G.formation[idx] = null;
+      refreshFormationTab();
+    }
+  });
+}
+
+function setupBenchDrag(item, heroIdx) {
+  item.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('heroIdx', String(heroIdx));
+    e.dataTransfer.setData('fromCell', '');
+    item.classList.add('dragging');
+  });
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+  });
+
+  // 手机：点击选中
+  item.addEventListener('click', () => {
+    if (selectedBenchHero === heroIdx) {
+      selectedBenchHero = null;
+    } else {
+      selectedBenchHero = heroIdx;
+      showToast('已选中 ' + G.playerHeroes[heroIdx].heroName + '，点击格子放置', 1500);
+    }
+    refreshFormationTab();
+  });
+}
+
+function refreshFormationTab() {
+  if (currentCampTab === 'formation') {
+    const panel = document.getElementById('campPanel');
+    panel.innerHTML = '';
+    renderFormationTab(panel);
+  }
+}
+
+function renderInventoryTab(panel) {
+  const wrap = document.createElement('div');
+  wrap.style.maxWidth = '700px';
+  wrap.style.margin = '0 auto';
+
+  const goldBox = document.createElement('div');
+  goldBox.style.cssText = `
+    background: linear-gradient(135deg, rgba(80,60,20,.9), rgba(40,30,10,.9));
+    border: 2px solid #c9a96a; border-radius: 12px;
+    padding: 20px; margin-bottom: 24px; text-align: center;
+  `;
+  goldBox.innerHTML = `
+    <div style="font-size:14px;color:#c9a96a;letter-spacing:4px;margin-bottom:8px;">当 前 金 币</div>
+    <div style="font-size:42px;color:#ffdd55;letter-spacing:2px;">💰 ${G.gold}</div>
+  `;
+  wrap.appendChild(goldBox);
+
+  const equipBox = document.createElement('div');
+  equipBox.style.cssText = `
+    background: rgba(30,20,10,.6);
+    border: 1px dashed #6b5333; border-radius: 12px;
+    padding: 60px 20px; text-align: center;
+    color: #8a7a5a; font-size: 15px; line-height: 2;
+    letter-spacing: 2px;
+  `;
+  equipBox.innerHTML = `
+    <div style="font-size:40px;margin-bottom:12px;">🎒</div>
+    <div>未 装 备 的 装 备</div>
+    <div style="font-size:12px;margin-top:8px;">（装 备 系 统 将 在 后 续 版 本 加 入）</div>
+  `;
+  wrap.appendChild(equipBox);
+
+  panel.appendChild(wrap);
+}
+
+function renderSaveTab(panel) {
+  panel.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'savePanel';
+  const data = loadSaveData();
+  let infoHtml = '';
+  if (data) {
+    const d = new Date(data.savedAt);
+    const timeStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    infoHtml = `
+      <div><span class="label">阵营：</span><span class="value">${data.playerFaction || '未知'}</span></div>
+      <div><span class="label">金币：</span><span class="value">${data.gold || 0}</span></div>
+      <div><span class="label">天数：</span><span class="value">第 ${data.day || 1} 天</span></div>
+      <div><span class="label">武将：</span><span class="value">${(data.playerHeroes || []).length} 人</span></div>
+      <div><span class="label">俘虏：</span><span class="value">${(data.capturedHeroes || []).length} 人</span></div>
+      <div><span class="label">存档时间：</span><span class="value">${timeStr}</span></div>
+    `;
+  } else {
+    infoHtml = '<div class="empty">暂 无 存 档</div>';
+  }
+  wrap.innerHTML = `
+    <div class="saveInfo">${infoHtml}</div>
+    <div class="saveActions">
+      <button class="saveAction" id="doSaveBtn">保 存 游 戏</button>
+      <button class="loadAction" id="doLoadBtn" ${data ? '' : 'disabled'}>读 取 存 档</button>
+    </div>
+  `;
+  panel.appendChild(wrap);
+  document.getElementById('doSaveBtn').onclick = () => {
+    const ok = saveGame();
+    if (ok) { showToast('游戏已保存', 1200); renderSaveTab(panel); }
+    else showToast('保存失败', 1200);
+  };
+  document.getElementById('doLoadBtn').onclick = () => {
+    if (!data) return;
+    const confirmLoad = confirm('读取存档会覆盖当前进度，确定吗？');
+    if (!confirmLoad) return;
+    restoreFromSave(data);
+    document.getElementById('campScreen').style.display = 'none';
+    if (mode !== STATE.MAP) {
+      G.battle = null;
+      G.anim = null;
+      mode = STATE.MAP;
+      hideCmdMenu(); hideUnitInfo(); hideHint();
+      document.getElementById('btnEndTurn').style.display = 'none';
+      document.getElementById('btnBack').style.display = 'none';
+      document.getElementById('infoLeft').textContent = '大地图';
+    }
+    document.getElementById('campBtn').style.display = 'block';
+    showToast('已读取存档', 1200);
+    log('已读取存档。');
+  };
+}
+
+document.getElementById('campBtn').onclick = openCamp;
+document.getElementById('campClose').onclick = closeCamp;
+document.querySelectorAll('.campTab').forEach(tab => {
+  tab.onclick = () => switchCampTab(tab.dataset.tab);
+});
+
+/* ======================== 存档序列化 ======================== */
+
+function serializeHero(h) {
+  return {
+    heroName: h.heroName, cls: h.cls, isHistorical: h.isHistorical,
+    level: h.level || 1, exp: h.exp || 0,
+    hp: h.hp, maxHp: h.maxHp, dead: h.dead || false,
+    growth: h.growth,
+    trait: h.trait || null,
+    forcedRank: h.forcedRank || null,
+  };
+}
+function deserializeHero(o) {
+  return {
+    heroName: o.heroName,
+    heroImg: o.isHistorical ? (HERO_DATA.heroes[o.heroName] || '') : randomHeroImg(),
+    cls: o.cls,
+    isHistorical: o.isHistorical,
+    level: o.level || 1,
+    exp: o.exp || 0,
+    hp: o.hp !== undefined ? o.hp : null,
+    maxHp: o.maxHp !== undefined ? o.maxHp : null,
+    dead: o.dead || false,
+    growth: o.growth || RANK_GROWTH['名将'],
+    trait: o.trait || null,
+    forcedRank: o.forcedRank || null,
+  };
+}
+function serializeEnemy(e) {
+  return {
+    col: e.col, row: e.row, x: e.x, y: e.y,
+    hp: e.hp, maxHp: e.maxHp,
+    heroName: e.heroName, heroImg: e.heroImg,
+    cls: e.cls, faction: e.faction,
+    isHistorical: e.isHistorical,
+    level: e.level || 1,
+    rank: e.rank,
+    trait: e.trait || null,
+    growth: e.growth || null,
+    enemyCount: e.enemyCount,
+    targetCol: e.targetCol, targetRow: e.targetRow,
+    moveCooldown: e.moveCooldown,
+  };
+}
+function deserializeEnemy(o) {
+  return Object.assign({}, o, { vx: 0, vy: 0, speed: 0, r: 16 });
+}
+
+function saveGame() {
+  const data = {
+    version: 3, savedAt: Date.now(),
+    playerFaction: G.playerFaction,
+    playerHeroes: G.playerHeroes.map(serializeHero),
+    formation: G.formation,
+    capturedHeroes: G.capturedHeroes,
+    usedHeroes: Array.from(G.usedHeroes.entries()),
+    day: G.day, moveSteps: G.moveSteps, lastSpawnStep: G.lastSpawnStep,
+    gold: G.gold,
+    player: {
+      x: G.player.x, y: G.player.y,
+      gridCol: G.player.gridCol, gridRow: G.player.gridRow,
+    },
+    enemies: G.enemies.map(serializeEnemy),
+  };
+  try {
+    localStorage.setItem('sanguo_save_v1', JSON.stringify(data));
+    return true;
+  } catch (e) { console.warn('保存失败:', e); return false; }
+}
+function loadSaveData() {
+  try {
+    const s = localStorage.getItem('sanguo_save_v1');
+    if (!s) return null;
+    return JSON.parse(s);
+  } catch (e) { return null; }
+}
+function restoreFromSave(data) {
+  G.playerFaction = data.playerFaction;
+  G.playerHeroes = data.playerHeroes.map(deserializeHero);
+  G.formation = data.formation || [null,null,null,null,null,null,null,null,null];
+  G.capturedHeroes = data.capturedHeroes || [];
+  G.usedHeroes = new Map(data.usedHeroes || []);
+  G.day = data.day || 1;
+  G.moveSteps = data.moveSteps || 0;
+  G.lastSpawnStep = data.lastSpawnStep || 0;
+  G.gold = data.gold || 100;
+  generateTerrain();
+  initCities();
+  G.player.x = data.player.x;
+  G.player.y = data.player.y;
+  G.player.gridCol = data.player.gridCol;
+  G.player.gridRow = data.player.gridRow;
+  G.player.path = [];
+  G.player.moving = false;
+  G.player.invuln = 0;
+  G.enemies = (data.enemies || []).map(deserializeEnemy);
+  cam.x = clamp(G.player.x - W / 2, 0, Math.max(0, MAP_W - W));
+  cam.y = clamp(G.player.y - H / 2, 0, Math.max(0, MAP_H - H));
+  updateGoldUI();
+}
+
+/* ======================== 主循环 ======================== */
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  if (mode === STATE.MAP) {
+    updateMap(dt);
+    drawMap();
+    document.getElementById('infoRight').textContent = '日：' + G.day;
+  } else if (mode === STATE.BATTLE) {
+    drawBattle();
+  } else if (mode === STATE.ANIM) {
+    updateAnim(dt);
+    drawBattle();
+    drawAnim();
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ======================== 输入 ======================== */
+
+function pointerPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+}
+
+canvas.addEventListener('pointerdown', e => {
+  const p = pointerPos(e);
+  if (mode === STATE.ANIM) {
+    if (G.anim && G.anim.type === 'battle') {
+      const d = G.anim.done;
+      G.anim = null;
+      mode = G.battle ? STATE.BATTLE : STATE.MAP;
+      if (typeof d === 'function') d();
+    }
+    return;
+  }
+  if (mode === STATE.MAP) {
+    const worldX = p.x + cam.x;
+    const worldY = p.y + cam.y;
+    const g = worldToGrid(worldX, worldY);
+    if (!terrainWalkable(g.col, g.row)) {
+      showToast('那里无法通行', 800);
+      return;
+    }
+    const path = findPathGrid(G.player.gridCol, G.player.gridRow, g.col, g.row);
+    if (!path || path.length === 0) {
+      showToast('找不到路径', 800);
+      return;
+    }
+    G.player.path = path;
+    G.player.pathIdx = 0;
+    G.player.moving = true;
+  } else if (mode === STATE.BATTLE) {
+    battleClick(p.x, p.y);
+  }
+});
+
+document.getElementById('btnEndTurn').onclick = () => {
+  if (mode === STATE.BATTLE && !G.anim && G.battle && G.battle.phase === PHASE.SELECT) {
+    endTurn();
+  } else {
+    log('请先完成当前单位行动。');
+  }
+};
+document.getElementById('btnBack').onclick = () => {
+  if (mode === STATE.BATTLE && G.battle) tryRetreat();
+};
+
+/* ======================== 启动 ======================== */
+
+loadAllAssets().then(() => {
+  showBirthScreen();
+});
+</script>
+</body>
+</html>

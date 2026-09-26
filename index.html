@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+，<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -363,6 +363,37 @@
   .benchHero .name { font-size:14px; }
   .benchHero .cls { color:#c9a96a; font-size:11px; }
   .benchHero.inGrid { opacity:.35; }
+/* 装备卡片 */
+.equipGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.equipCard {
+  background: rgba(40,28,14,.9); border: 2px solid #6b5333;
+  border-radius: 10px; padding: 12px;
+  display: flex; gap: 12px;
+}
+.equipCard .icon {
+  font-size: 36px; width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(20,14,8,.8); border-radius: 8px;
+  flex-shrink: 0;
+}
+.equipCard .info { flex: 1; font-size: 12px; line-height: 1.6; }
+.equipCard .name { font-size: 14px; margin-bottom: 2px; }
+.equipCard .part { color: #c9a96a; font-size: 11px; margin-bottom: 4px; }
+.equipCard .stat { color: #b8a888; }
+.equipCard .stat span { color: #e8dcc8; }
+.equipCard .special {
+  color: #ffaa2a; font-size: 11px;
+  border-top: 1px dashed #6b5333;
+  margin-top: 4px; padding-top: 4px;
+}
+.equipCard .sellBtn {
+  margin-top: 6px; padding: 4px 12px; font-size: 11px;
+  background: #5a2020; border-color: #c0392b; color: #fff;
+}
 .benchHero.selected {
   border-color: #ffdd55 !important;
   background: rgba(90,65,30,.95) !important;
@@ -516,6 +547,101 @@
     gap:16px; margin-top:20px; padding-top:16px;
     border-top:1px dashed #6b5333;
   }
+/* ===== 武将装备界面 ===== */
+#equipScreen {
+  position:absolute; inset:0; background:rgba(10,6,4,.97);
+  display:none; flex-direction:column; z-index:240; padding:20px;
+}
+#equipScreen .equipHeader {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 20px; border-bottom:2px solid #6b5333; margin-bottom:20px;
+}
+#equipScreen .equipTitle {
+  font-size:24px; color:#c9a96a; letter-spacing:6px;
+}
+#equipScreen .equipHeroName {
+  font-size:18px; margin-left:16px;
+}
+#equipScreen .equipCloseBtn {
+  font-size:14px; padding:8px 20px;
+}
+.equipBody {
+  flex:1; display:flex; gap:24px; overflow:hidden;
+}
+.equipSlots {
+  flex:1; display:flex; flex-direction:column; gap:14px;
+  padding:20px; background:rgba(20,14,8,.5);
+  border:1px solid #6b5333; border-radius:10px;
+  overflow-y:auto;
+}
+.equipSlot {
+  display:flex; gap:14px; align-items:center;
+  background:rgba(40,28,14,.9); border:2px solid #6b5333;
+  border-radius:10px; padding:14px 16px;
+  cursor:pointer; transition:all .2s;
+}
+.equipSlot:hover { border-color:#c9a96a; }
+.equipSlot.empty { opacity:0.5; cursor:default; }
+.equipSlot.empty:hover { border-color:#6b5333; }
+.equipSlot .slotIcon {
+  font-size:36px; width:56px; height:56px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(20,14,8,.8); border-radius:8px;
+  flex-shrink:0;
+}
+.equipSlot .slotInfo { flex:1; font-size:13px; line-height:1.6; }
+.equipSlot .slotName { font-size:15px; margin-bottom:2px; }
+.equipSlot .slotPart { color:#c9a96a; font-size:11px; }
+.equipSlot .slotStat { color:#b8a888; font-size:12px; }
+.equipSlot .slotSpecial { color:#ffaa2a; font-size:11px; margin-top:2px; }
+.equipSlot .unequipBtn {
+  padding:6px 14px; font-size:12px; flex-shrink:0;
+  background:#5a2020; border-color:#c0392b; color:#fff;
+}
+.equipAvailable {
+  flex:1; display:flex; flex-direction:column;
+  padding:20px; background:rgba(20,14,8,.5);
+  border:1px solid #6b5333; border-radius:10px;
+  overflow:hidden;
+}
+.equipAvailableTitle {
+  font-size:14px; color:#c9a96a; letter-spacing:2px;
+  margin-bottom:12px; flex-shrink:0;
+}
+.equipAvailable .equipGrid {
+  flex:1; overflow-y:auto;
+}
+.equipAvailCard {
+  background:rgba(40,28,14,.9); border:2px solid #6b5333;
+  border-radius:10px; padding:12px; display:flex; gap:12px;
+  cursor:pointer; transition:all .2s;
+}
+.equipAvailCard:hover {
+  border-color:#c9a96a !important;
+  background:rgba(60,42,22,.95);
+  transform:translateY(-2px);
+}
+.equipAvailCard .icon {
+  font-size:32px; width:48px; height:48px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(20,14,8,.8); border-radius:8px;
+  flex-shrink:0;
+}
+.equipAvailCard .info { flex:1; font-size:12px; line-height:1.5; }
+.equipAvailCard .name { font-size:14px; margin-bottom:2px; }
+.equipAvailCard .cls { color:#c9a96a; font-size:11px; margin-bottom:3px; }
+.equipAvailCard .stat { color:#b8a888; font-size:11px; }
+.equipAvailCard .special { color:#ffaa2a; font-size:10px; margin-top:3px; }
+.equipAvailEmpty {
+  text-align:center; padding:40px 20px;
+  color:#8a7a5a; font-size:14px; letter-spacing:2px;
+  line-height:2;
+}
+@media (max-width: 700px) {
+  .equipBody { flex-direction:column; }
+  .equipSlots { flex:none; max-height:40%; }
+  .equipAvailable { flex:none; max-height:50%; }
+}
   .emptyShop {
     text-align:center; padding:80px 20px;
     color:#8a7a5a; font-size:16px; letter-spacing:2px;
@@ -544,6 +670,93 @@
   .saveActions button { width:100%; }
   .shopGrid { grid-template-columns:1fr; }
 }
+/* ===== 相遇弹窗 ===== */
+#encounterScreen, #dungeonEntryScreen, #dungeonLayerScreen {
+  position:absolute; inset:0; background:rgba(5,3,2,.7);
+  display:none; align-items:center; justify-content:center;
+  z-index:235;
+}
+.encounterBox {
+  background:linear-gradient(135deg, rgba(60,40,20,.98), rgba(30,20,10,.98));
+  border:3px solid #c9a96a; border-radius:14px;
+  padding:28px 40px; min-width:420px; max-width:80%;
+  box-shadow:0 8px 60px rgba(0,0,0,.9);
+  text-align:center;
+}
+.encounterTitle {
+  font-size:24px; color:#c9a96a; letter-spacing:6px;
+  margin-bottom:16px;
+}
+.encounterInfo {
+  font-size:14px; color:#e8dcc8; line-height:2;
+  text-align:left; padding:12px 0;
+  border-top:1px dashed #6b5333;
+  border-bottom:1px dashed #6b5333;
+  margin-bottom:20px;
+}
+.encounterInfo .label { color:#c9a96a; }
+.encounterInfo .value { color:#e8dcc8; }
+.encounterInfo .enemy { color:#e74c3c; }
+.encounterInfo .friend { color:#4caf50; }
+.encounterInfo .neutral { color:#c9a96a; }
+.encounterActions {
+  display:flex; gap:16px; justify-content:center;
+}
+.encounterActions button {
+  padding:12px 40px; font-size:15px; letter-spacing:2px;
+  border-radius:8px;
+}
+.encounterAtk {
+  background:#5a2020; border-color:#c0392b; color:#fff;
+}
+.encounterAtk:hover { background:#7a2a2a; }
+.encounterPass {
+  background:#2a4a6a; border-color:#4a8ac0; color:#fff;
+}
+.encounterPass:hover { background:#3a5a7a; }
+
+/* ===== 胜利界面 ===== */
+#victoryScreen {
+  position:absolute; inset:0; background:rgba(5,3,2,.95);
+  display:none; align-items:center; justify-content:center;
+  z-index:300;
+}
+.victoryBox {
+  text-align:center; padding:40px;
+}
+.victoryTitle {
+  font-size:72px; color:#ffdd55; letter-spacing:24px;
+  text-shadow:0 8px 40px rgba(255,220,120,.6);
+  animation: victoryGlow 2s ease-in-out infinite;
+}
+@keyframes victoryGlow {
+  0%, 100% { text-shadow:0 8px 40px rgba(255,220,120,.6); }
+  50% { text-shadow:0 8px 80px rgba(255,220,120,1); }
+}
+.victorySubtitle {
+  font-size:20px; color:#c9a96a; letter-spacing:8px;
+  margin-top:20px;
+}
+.victoryStats {
+  margin-top:40px; font-size:15px; color:#e8dcc8;
+  line-height:2.4;
+}
+.victoryStats .label { color:#c9a96a; }
+.victoryOk {
+  margin-top:48px; padding:14px 60px;
+  font-size:16px; letter-spacing:4px;
+  background:#2a5a2a; border:2px solid #4caf50; color:#fff;
+  border-radius:8px;
+}
+.victoryOk:hover { background:#3a7a3a; }
+
+@media (max-width: 700px) {
+  .encounterBox { padding:20px 16px; min-width:auto; max-width:95%; }
+  .encounterTitle { font-size:18px; letter-spacing:3px; }
+  .encounterActions button { padding:10px 20px; font-size:13px; }
+  .victoryTitle { font-size:40px; letter-spacing:12px; }
+  .victorySubtitle { font-size:14px; letter-spacing:4px; }
+}
 </style>
 </head>
 <body>
@@ -551,7 +764,15 @@
 
 <div id="ui">
   <div class="panel" id="infoLeft">大地图</div>
-  <div class="panel" id="goldPanel" style="position:absolute;left:50%;transform:translateX(-50%);top:10px;border-color:#c9a96a;color:#ffdd55;">💰 <span id="goldAmount">100</span></div>
+  <div class="panel" id="legendPanel" style="position:absolute; left:10px; top:100px; font-size:11px; line-height:1.8; display:none; pointer-events:none;">
+    <div style="color:#c9a96a;letter-spacing:2px;margin-bottom:4px;">阵 营 关 系</div>
+    <div><span style="color:#e74c3c;">■</span> 死敌（直接开战）</div>
+    <div><span style="color:#e67e22;">■</span> 敌对（可攻可绕）</div>
+    <div><span style="color:#c9a96a;">■</span> 中立</div>
+    <div><span style="color:#6ab04c;">■</span> 友好</div>
+    <div><span style="color:#4caf50;">■</span> 盟友</div>
+  </div>
+<div class="panel" id="goldPanel" style="position:absolute;left:50%;transform:translateX(-50%);top:10px;border-color:#c9a96a;color:#ffdd55;z-index:250;">💰 <span id="goldAmount">100</span></div>
   <div class="panel" id="infoRight">日：1</div>
 </div>
 
@@ -574,8 +795,18 @@
   <div class="bar"><div class="fill" id="loadFill"></div></div>
   <div class="txt" id="loadTxt">加载素材中…</div>
 </div>
-
+<!-- 存档选择弹窗 -->
+<div id="saveSelectScreen" style="position:absolute; inset:0; background:rgba(5,3,2,.85); display:none; align-items:center; justify-content:center; z-index:250;">
+  <div class="encounterBox" style="min-width:520px;">
+    <div class="encounterTitle">选 择 存 档</div>
+    <div id="saveSelectList" style="margin:20px 0;"></div>
+    <div class="encounterActions">
+      <button class="encounterPass" id="saveSelectCancel">取 消</button>
+    </div>
+  </div>
+</div>
 <div id="birthScreen">
+
   <div class="title">选 择 出 生</div>
   <div class="subtitle">不同出身，决定你的初始武将与命运</div>
   <button class="continueBtn" id="continueBtn" style="display:none">继 续 游 戏</button>
@@ -611,11 +842,76 @@
     <div class="campTab" data-tab="captives">俘 虏</div>
     <div class="campTab" data-tab="formation">布 阵</div>
     <div class="campTab" data-tab="inventory">包 裹</div>
+    <div class="campTab" data-tab="diplomacy">外 交</div>
     <div class="campTab" data-tab="save">存 档</div>
   </div>
   <div class="campPanel" id="campPanel"></div>
 </div>
+<!-- 武将装备界面 -->
+<div id="equipScreen">
+  <div class="equipHeader">
+    <div>
+      <span class="equipTitle">装 备</span>
+      <span class="equipHeroName" id="equipHeroName">—</span>
+    </div>
+    <button class="equipCloseBtn" id="equipClose">关 闭</button>
+  </div>
+  <div class="equipBody">
+    <div class="equipSlots" id="equipSlots"></div>
+    <div class="equipAvailable">
+      <div class="equipAvailableTitle" id="equipAvailTitle">可装备</div>
+      <div class="equipGrid" id="equipAvailList"></div>
+    </div>
+  </div>
+</div>
+<!-- 相遇弹窗 -->
+<div id="encounterScreen">
+  <div class="encounterBox">
+    <div class="encounterTitle">遭 遇 部 队</div>
+    <div class="encounterInfo" id="encounterInfo"></div>
+    <div class="encounterActions">
+      <button class="encounterAtk" id="encounterAtk">攻 击</button>
+      <button class="encounterPass" id="encounterPass">绕 行</button>
+    </div>
+  </div>
+</div>
 
+<!-- 副本选择弹窗 -->
+<div id="dungeonEntryScreen">
+  <div class="encounterBox">
+    <div class="encounterTitle" id="dungeonEntryTitle">副 本</div>
+    <div class="encounterInfo" id="dungeonEntryInfo"></div>
+    <div class="encounterActions">
+      <button class="encounterAtk" id="dungeonEnter">进 入</button>
+      <button class="encounterPass" id="dungeonCancel">离 开</button>
+    </div>
+  </div>
+</div>
+
+<!-- 层间选择弹窗 -->
+<div id="dungeonLayerScreen">
+  <div class="encounterBox">
+    <div class="encounterTitle" id="dungeonLayerTitle">第 1 层 完 成</div>
+    <div class="encounterInfo" id="dungeonLayerInfo"></div>
+    <div class="encounterActions">
+      <button class="encounterAtk" id="dungeonNext">继 续 深 入</button>
+      <button class="encounterPass" id="dungeonRetreat">撤 退</button>
+    </div>
+  </div>
+</div>
+
+<!-- 胜利界面 -->
+<div id="victoryScreen">
+  <div class="victoryBox">
+    <div class="victoryTitle">天 下 一 统</div>
+    <div class="victorySubtitle" id="victorySubtitle">你统一了天下</div>
+    <div class="victoryStats" id="victoryStats"></div>
+    <button class="victoryOk" id="victoryOk">重 新 开 始</button>
+  </div>
+</div>
+
+
+/* ===== 战后结算界面 ===== */
 <!-- 战后结算 -->
 <div id="resultScreen">
   <div class="resultBox">
@@ -883,6 +1179,117 @@ const RANK_RECRUIT_PRICE = {
 const RANK_REVIVE_PRICE = {
   '凡将': 100, '良将': 200, '名将': 400, '上将': 800, '神将': 1500,
 };
+
+/* ======================== 装备系统 ======================== */
+
+const EQUIP_PARTS = {
+  '武器': { icon: '⚔', mainStat: 'atk' },
+  '防具': { icon: '🛡', mainStat: 'def' },
+  '坐骑': { icon: '🐴', mainStat: 'mov' },
+};
+
+const EQUIP_RANK_TABLE = {
+  '凡品': { color:'#aaa', atk:[1,3],   def:[1,3],   hp:[5,10],   mov:0, dodge:0,    price:100 },
+  '良品': { color:'#4caf50', atk:[3,6],  def:[3,6],   hp:[10,20],  mov:0, dodge:0,    price:300 },
+  '名品': { color:'#4a9be8', atk:[6,12], def:[6,12],  hp:[20,40],  mov:1, dodge:0.03, price:800 },
+  '上品': { color:'#a05ad0', atk:[12,20],def:[12,20], hp:[40,80],  mov:1, dodge:0.05, price:2000 },
+  '神品': { color:'#ffaa2a', atk:[20,35],def:[20,35], hp:[80,150], mov:2, dodge:0.08, price:6000 },
+};
+
+/* 名字池（按部位 × 品级） */
+const EQUIP_NAMES = {
+  '武器': {
+    '凡品': ['生锈的铁剑', '木棍', '短刀', '柴刀'],
+    '良品': ['精铁剑', '环首刀', '铁枪', '长弓'],
+    '名品': ['寒光剑', '双铁戟', '月牙铲', '素缨枪'],
+    '上品': ['霸王枪', '龙胆亮银枪', '古锭刀', '落日弓'],
+    '神品': ['青龙偃月刀', '方天画戟', '丈八蛇矛', '倚天剑', '雌雄双股剑'],
+  },
+  '防具': {
+    '凡品': ['破旧的皮甲', '麻布衣', '木盾'],
+    '良品': ['皮甲', '铜片甲', '藤盾'],
+    '名品': ['锁子甲', '铁叶甲', '玄武盾'],
+    '上品': ['明光铠', '鱼鳞甲', '连环甲'],
+    '神品': ['兽面吞头铠', '白银狮子甲', '黄金锁子甲'],
+  },
+  '坐骑': {
+    '凡品': ['瘦马', '驽马'],
+    '良品': ['黄鬃马', '黑鬃马', '枣红马'],
+    '名品': ['西凉马', '白马'],
+    '上品': ['乌云踏雪', '紫骍马', '大宛马'],
+    '神品': ['赤兔马', '的卢马', '爪黄飞电', '绝影'],
+  },
+};
+
+/* 神品专属特效 */
+const EQUIP_SPECIAL = {
+  '青龙偃月刀': { name:'斩杀', desc:'攻击时 15% 概率触发斩杀（伤害 ×1.5）' },
+  '方天画戟': { name:'饮血', desc:'击杀敌人后恢复 20 HP' },
+  '丈八蛇矛': { name:'蛇影', desc:'攻击溅射相邻敌人 20%' },
+  '倚天剑': { name:'破甲', desc:'攻击时无视 15% 防御' },
+  '雌雄双股剑': { name:'连击', desc:'每回合第一次攻击 +30%' },
+  '兽面吞头铠': { name:'不屈', desc:'HP < 30% 时防御 +50%' },
+  '白银狮子甲': { name:'狮吼', desc:'免疫"克制"减伤' },
+  '黄金锁子甲': { name:'金身', desc:'受到伤害 -15%' },
+  '赤兔马': { name:'疾驰', desc:'移动 +1，闪避 +10%' },
+  '的卢马': { name:'飞跃', desc:'闪避 +15%' },
+  '爪黄飞电': { name:'闪电', desc:'移动 +2' },
+  '绝影': { name:'无双', desc:'反击伤害 +20%' },
+};
+
+/* 装备唯一 ID 计数器 */
+let _equipIdCounter = 1;
+
+/* 随机生成一件装备 */
+function generateEquip(forcedPart, forcedRank) {
+  const parts = ['武器', '防具', '坐骑'];
+  const ranks = ['凡品', '良品', '名品', '上品', '神品'];
+  const part = forcedPart || parts[Math.floor(Math.random() * parts.length)];
+  const rank = forcedRank || rollEquipRank();
+  const table = EQUIP_RANK_TABLE[rank];
+  const names = EQUIP_NAMES[part][rank];
+  const name = names[Math.floor(Math.random() * names.length)];
+
+  const rand = (range) => Math.floor(range[0] + Math.random() * (range[1] - range[0] + 1));
+
+  const eq = {
+    id: _equipIdCounter++,
+    name: name,
+    part: part,
+    rank: rank,
+    color: table.color,
+    atk: 0, def: 0, hp: 0, mov: 0, dodge: 0,
+    special: null,
+    price: table.price,
+  };
+
+  if (part === '武器') {
+    eq.atk = rand(table.atk);
+  } else if (part === '防具') {
+    eq.def = rand(table.def);
+    eq.hp = rand(table.hp);
+  } else if (part === '坐骑') {
+    eq.mov = table.mov;
+    eq.dodge = table.dodge;
+  }
+
+  // 神品特效
+  if (rank === '神品' && EQUIP_SPECIAL[name]) {
+    eq.special = EQUIP_SPECIAL[name];
+  }
+  return eq;
+}
+
+/* 随机掉落品级 */
+function rollEquipRank() {
+  const r = Math.random() * 100;
+  if (r < 50) return '凡品';
+  if (r < 80) return '良品';
+  if (r < 95) return '名品';
+  if (r < 99) return '上品';
+  return '神品';
+}
+ 
 function calcGrowthScore(g) {
   return g.atk * 15 + g.def * 15 + g.hp * 1.5 + g.spd * 30;
 }
@@ -1055,11 +1462,12 @@ function createRandomHero() {
     cls: cls,
     isHistorical: false,
     level: 1, exp: 0,
-    hp: null, maxHp: null,       // 战斗后的当前血量（null = 满）
-    dead: false,                  // 阵亡标记
+    hp: null, maxHp: null,
+    dead: false,
     growth: growth,
     trait: trait,
     forcedRank: rank,
+    equips: { '武器': null, '防具': null, '坐骑': null },   // ★ 装备栏
   };
 }
 
@@ -1074,6 +1482,7 @@ function createHistoricalHero(name, cls) {
     dead: false,
     growth: HISTORICAL_GROWTH[name] || RANK_GROWTH['名将'],
     trait: HISTORICAL_TRAIT[name] || null,
+    equips: { '武器': null, '防具': null, '坐骑': null },   // ★ 装备栏
   };
 }
 
@@ -1195,11 +1604,28 @@ function calcHeroStats(hero) {
     if (m.mov) mov += m.mov;
     if (m.range) range += m.range;
   }
+
+  // ★ 装备属性
+  let equipDodge = 0;
+  if (hero.equips) {
+    for (const part of ['武器', '防具', '坐骑']) {
+      const eq = hero.equips[part];
+      if (eq) {
+        if (eq.atk) atk += eq.atk;
+        if (eq.def) def += eq.def;
+        if (eq.hp) hp += eq.hp;
+        if (eq.mov) mov += eq.mov;
+        if (eq.dodge) equipDodge += eq.dodge;
+      }
+    }
+  }
+
   return {
     atk: Math.max(1, atk), def: Math.max(0, def),
     spd: Math.max(1, spd), hp: Math.max(1, hp),
     mov, range, rank,
     traitId: hero.trait || null,
+    equipDodge: equipDodge,   // ★ 装备额外闪避
   };
 }
 
@@ -1220,12 +1646,26 @@ const G = {
   battle: null, anim: null,
   capturedHeroes: [], usedHeroes: new Map(),
   formation: [null, null, null, null, null, null, null, null, null],
-  moveSteps: 0, lastSpawnStep: 0, enemyCap: 20,
+  moveSteps: 0, lastSpawnStep: 0, enemyCap: 20, lastDungeonRespawn: 0,
   pendingFaction: null,
   gold: 100,
+  equipments: [],          // 未装备的装备列表
   currentCity: null,     // 当前可进入的城池
   cityTavern: null,      // 当前酒馆刷新数据
-  inCity: null,          // 正在进入的城池对象
+    cityShop: null,
+  
+   inCity: null,          // 正在进入的城池对象
+  // ★ 阵营关系：{ '魏': -50, '吴': 20, ... }
+  factionRelations: {},
+  // ★ 地图上的副本
+  dungeons: [],
+  // ★ 副本相关的临时状态
+  currentDungeon: null,
+    // ★ 大地图上的相遇弹窗状态
+  pendingEncounter: null,
+  // ★ 副本弹窗状态
+  pendingDungeon: null,
+dungeonCooldown: 0,
 };
 
 const RESPAWN_DAYS = 5;
@@ -1296,7 +1736,179 @@ function isHeroAvailable(name) {
 }
 function heroPlainName(hero) { return (hero.isHistorical ? '★' : '') + hero.heroName; }
 function unitDisplayShort(u) { return (u.isHistorical ? '★' : '') + u.name; }
+/* ======================== 阵营关系系统 ======================== */
 
+/* 出生阵营 → 对其他阵营的初始关系 */
+const INITIAL_RELATIONS = {
+  '魏': { '魏': 100, '蜀': -50, '吴': -30, '黄巾': -60, '荆州': 20, '益州': -10, '西凉': 10 },
+  '蜀': { '魏': -50, '蜀': 100, '吴': 20, '黄巾': -80, '荆州': 30, '益州': 40, '西凉': -10 },
+  '吴': { '魏': -30, '蜀': 20, '吴': 100, '黄巾': -70, '荆州': 30, '益州': -10, '西凉': -20 },
+  '黄巾': { '魏': -60, '蜀': -80, '吴': -70, '黄巾': 100, '荆州': -50, '益州': -50, '西凉': -40 },
+  '荆州': { '魏': 20, '蜀': 30, '吴': 30, '黄巾': -50, '荆州': 100, '益州': 10, '西凉': 0 },
+  '益州': { '魏': -10, '蜀': 40, '吴': -10, '黄巾': -50, '荆州': 10, '益州': 100, '西凉': -20 },
+  '西凉': { '魏': 10, '蜀': -10, '吴': -20, '黄巾': -40, '荆州': 0, '益州': -20, '西凉': 100 },
+};
+
+/* 关系分档 */
+function relationStatus(v) {
+  if (v >= 80) return '盟友';
+  if (v >= 30) return '友好';
+  if (v >= -29) return '中立';
+  if (v >= -79) return '敌对';
+  return '死敌';
+}
+function relationColor(v) {
+  if (v >= 80) return '#4caf50';
+  if (v >= 30) return '#6ab04c';
+  if (v >= -29) return '#c9a96a';
+  if (v >= -79) return '#e67e22';
+  return '#e74c3c';
+}
+
+/* 初始化关系 */
+function initRelations(birthFaction) {
+  const base = INITIAL_RELATIONS[birthFaction] || {};
+  G.factionRelations = {};
+  for (const f of ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉']) {
+    G.factionRelations[f] = base[f] !== undefined ? base[f] : 0;
+  }
+}
+
+/* 修改关系 */
+function changeRelation(faction, delta) {
+  if (G.factionRelations[faction] === undefined) return;
+  G.factionRelations[faction] = Math.max(-100, Math.min(100, G.factionRelations[faction] + delta));
+}
+
+/* ======================== 中立 NPC ======================== */
+
+const NEUTRAL_TYPES = [
+  { name: '黄巾贼', cls: '步兵', strength: 0.8 },
+  { name: '山贼', cls: '剑客', strength: 1.0 },
+  { name: '异族', cls: '骑兵', strength: 1.3 },
+];
+
+/* ======================== 副本系统 ======================== */
+
+const DUNGEON_TYPES = {
+  '山寨': {
+    icon: '🏯',
+    layers: 1,
+    color: '#c9a96a',
+    desc: '山贼窝点，人不多，但油水足',
+  },
+  '遗迹': {
+    icon: '🏛',
+    layers: 2,
+    color: '#4a9be8',
+    desc: '远古遗迹，机关与守卫并存',
+  },
+  '古墓': {
+    icon: '⚱',
+    layers: 3,
+    color: '#a05ad0',
+    desc: '王侯古墓，传闻有神兵陪葬',
+  },
+};
+
+let _dungeonIdCounter = 1;
+const DUNGEON_MAX = 5;
+const DUNGEON_RESPAWN_STEPS = 200;
+
+/* 生成一个副本 */
+function generateDungeon() {
+  const types = Object.keys(DUNGEON_TYPES);
+  // 高级副本稀有：山寨 50% / 遗迹 30% / 古墓 20%
+  const r = Math.random();
+  let type;
+  if (r < 0.5) type = '山寨';
+  else if (r < 0.8) type = '遗迹';
+  else type = '古墓';
+
+  const pos = randomWalkablePos();
+  return {
+    id: _dungeonIdCounter++,
+    type: type,
+    col: pos.col,
+    row: pos.row,
+    x: pos.x,
+    y: pos.y,
+    layers: DUNGEON_TYPES[type].layers,
+    desc: DUNGEON_TYPES[type].desc,
+  };
+}
+
+/* 初始化副本（开局刷 3 个） */
+function initDungeons() {
+  G.dungeons = [];
+  for (let i = 0; i < 3; i++) {
+    G.dungeons.push(generateDungeon());
+  }
+}
+
+/* 副本生成敌人（按类型 + 层数） */
+function generateDungeonEnemies(dungeon, layer) {
+  const type = dungeon.type;
+  const enemies = [];
+
+  // 按类型和层数确定敌人数量和历史武将数量
+  let count, historicalCount, avgRank;
+  if (type === '山寨') {
+    count = 3;
+    historicalCount = 0;
+    avgRank = '良将';
+  } else if (type === '遗迹') {
+    if (layer === 1) { count = 3; historicalCount = 0; avgRank = '名将'; }
+    else { count = 4; historicalCount = 1; avgRank = '名将'; }
+  } else if (type === '古墓') {
+    if (layer === 1) { count = 3; historicalCount = 1; avgRank = '名将'; }
+    else if (layer === 2) { count = 4; historicalCount = 1; avgRank = '上将'; }
+    else { count = 5; historicalCount = 2; avgRank = '上将'; }
+  }
+
+  // 主将
+  const factionList = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉', '中立'];
+  const faction = factionList[randInt(0, factionList.length - 1)];
+
+  let mainHero;
+  if (historicalCount > 0) {
+    const pool = (HISTORICAL_FACTION[faction] || [])
+      .filter(n => HERO_DATA.heroes[n])
+      .filter(n => isHeroAvailable(n));
+    if (pool.length) {
+      const name = pool[randInt(0, pool.length - 1)];
+      mainHero = createHistoricalHero(name, guessClassForHero(name));
+      markHeroActive(name);
+    } else {
+      mainHero = createRandomHero();
+    }
+  } else {
+    mainHero = createRandomHero();
+  }
+  // 副本怪属性加强
+  mainHero.level = Math.max(mainHero.level || 1, 3 + layer * 2);
+
+  enemies.push({
+    mainHero: mainHero,
+    count: count,
+    historicalCount: historicalCount,
+    isDungeon: true,
+    dungeon: dungeon,
+    layer: layer,
+    faction: faction,
+  });
+
+  return enemies[0];
+}
+
+/* 刷副本（在地图上补一个） */
+function respawnDungeon() {
+  if (G.dungeons.length >= DUNGEON_MAX) return;
+  G.dungeons.push(generateDungeon());
+  log('⚔ 远处出现了一处新的副本……');
+}
+
+/* ======================== 地形 ======================== */
 /* ======================== 地形 ======================== */
 
 const TILE_SIZE = 60;
@@ -1506,7 +2118,66 @@ function findPathGrid(startCol, startRow, endCol, endRow) {
 }
 
 /* ======================== 出生选择 ======================== */
+function showSaveSelectDialog() {
+  const screen = document.getElementById('saveSelectScreen');
+  const list = document.getElementById('saveSelectList');
+  list.innerHTML = '';
 
+  for (let slot = 1; slot <= 5; slot++) {
+    const data = loadSaveData(slot);
+    const row = document.createElement('div');
+    row.style.cssText = `
+      background: rgba(40,28,14,.9);
+      border: 2px solid ${data ? '#c9a96a' : '#6b5333'};
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: ${data ? 'pointer' : 'default'};
+      opacity: ${data ? 1 : 0.5};
+    `;
+    if (data) {
+      const d = new Date(data.savedAt);
+      const timeStr = `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      row.innerHTML = `
+        <div>
+          <div style="font-size:16px;color:#ffdd55;letter-spacing:2px;">存档 ${slot}</div>
+          <div style="font-size:12px;color:#b8a888;margin-top:4px;">
+            ${data.playerFaction} · 第${data.day}天 · ${data.gold}金 · ${(data.playerHeroes||[]).length}将
+          </div>
+        </div>
+        <div style="font-size:11px;color:#8a7a5a;">${timeStr}</div>
+      `;
+      row.onmouseenter = () => row.style.background = 'rgba(80,55,25,.95)';
+      row.onmouseleave = () => row.style.background = 'rgba(40,28,14,.9)';
+      row.onclick = () => {
+        if (!confirm('读取存档 ' + slot + ' 会覆盖当前进度，确定吗？')) return;
+        restoreFromSave(data);
+        screen.style.display = 'none';
+        document.getElementById('birthScreen').style.display = 'none';
+        document.getElementById('campBtn').style.display = 'block';
+        log('欢迎回来。');
+        requestAnimationFrame(loop);
+      };
+    } else {
+      row.innerHTML = `
+        <div>
+          <div style="font-size:16px;color:#8a7a5a;letter-spacing:2px;">存档 ${slot}</div>
+          <div style="font-size:12px;color:#8a7a5a;margin-top:4px;">空 槽 位</div>
+        </div>
+      `;
+    }
+    list.appendChild(row);
+  }
+
+  screen.style.display = 'flex';
+}
+
+document.getElementById('saveSelectCancel').onclick = () => {
+  document.getElementById('saveSelectScreen').style.display = 'none';
+};
 function showBirthScreen() {
   const grid = document.getElementById('birthGrid');
   grid.innerHTML = '';
@@ -1526,19 +2197,20 @@ function showBirthScreen() {
     card.onclick = () => openHeroPick(faction);
     grid.appendChild(card);
   }
-  const save = loadSaveData();
-  if (save) {
-    document.getElementById('continueBtn').style.display = 'block';
+   // ★ 检查 5 个槽位
+  const slots = [1, 2, 3, 4, 5].map(n => loadSaveData(n));
+  const hasAny = slots.some(s => s);
+  if (hasAny) {
+    const continueBtn = document.getElementById('continueBtn');
+    continueBtn.style.display = 'block';
     document.getElementById('birthDivider').style.display = 'block';
-    document.getElementById('continueBtn').onclick = () => {
-      restoreFromSave(save);
-      document.getElementById('birthScreen').style.display = 'none';
-      document.getElementById('campBtn').style.display = 'block';
-      log('欢迎回来。');
-      requestAnimationFrame(loop);
+    continueBtn.textContent = '继 续 游 戏（选 择 存 档）';
+    continueBtn.onclick = () => {    
+      showSaveSelectDialog();
     };
-  }
-  document.getElementById('birthScreen').style.display = 'flex';
+}
+
+document.getElementById('birthScreen').style.display = 'flex';
 }
 
 function openHeroPick(faction) {
@@ -1652,6 +2324,8 @@ function initCities() {
 function initMap() {
   generateTerrain();
   initCities();
+  initRelations(G.playerFaction);
+  initDungeons();
   const startPos = gridToWorld(10, 9);
   G.player.x = startPos.x;
   G.player.y = startPos.y;
@@ -1682,22 +2356,59 @@ function randomWalkablePos() {
 }
 
 function spawnEnemy() {
-  const factionList = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉', '中立'];
-  const faction = factionList[randInt(0, factionList.length - 1)];
+  // 判断刷新哪一类：中立 NPC 或 阵营武将
+  // 初期：70% 中立 / 30% 阵营
+  // 走 50 步后：60% / 40%
+  // 走 150 步后：50% / 50%
+  let neutralRatio = 0.7;
+  if (G.moveSteps > 50) neutralRatio = 0.6;
+  if (G.moveSteps > 150) neutralRatio = 0.5;
+
+  const isNeutral = Math.random() < neutralRatio;
+
+  if (isNeutral) {
+    // 中立 NPC
+    const t = NEUTRAL_TYPES[randInt(0, NEUTRAL_TYPES.length - 1)];
+    const cls = t.cls;
+    const base = CLASS_STATS[cls] || CLASS_STATS['步兵'];
+    const hp = Math.round((80 + base.def * 2) * t.strength);
+    const pos = randomWalkablePos();
+    const count = enemyCountBySteps(G.moveSteps);
+    G.enemies.push({
+      col: pos.col, row: pos.row, x: pos.x, y: pos.y,
+      hp: hp, maxHp: hp,
+      heroName: t.name, heroImg: randomHeroImg(),
+      cls: cls,
+      faction: '中立',
+      isHistorical: false,
+      isNeutralNPC: true,
+      level: 1,
+      rank: '良将',
+      trait: null,
+      growth: RANK_GROWTH['良将'],
+      enemyCount: count,
+      targetCol: pos.col, targetRow: pos.row,
+      moveCooldown: rand(1, 3)
+    });
+    return;
+  }
+
+  // 阵营武将
+  const factionList = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉'];
+  // 过滤掉和自己同阵营的
+  const pool = factionList.filter(f => f !== G.playerFaction);
+  const faction = pool[randInt(0, pool.length - 1)];
+
   let mainHero;
-  if (faction === '中立') {
-    mainHero = createRandomHero();
+  const heroPool = (HISTORICAL_FACTION[faction] || [])
+    .filter(n => HERO_DATA.heroes[n])
+    .filter(n => isHeroAvailable(n));
+  if (heroPool.length && Math.random() < 0.2) {
+    const name = heroPool[randInt(0, heroPool.length - 1)];
+    mainHero = createHistoricalHero(name, guessClassForHero(name));
+    markHeroActive(name);
   } else {
-    const pool = (HISTORICAL_FACTION[faction] || [])
-      .filter(n => HERO_DATA.heroes[n])
-      .filter(n => isHeroAvailable(n));
-    if (pool.length && Math.random() < 0.2) {
-      const name = pool[randInt(0, pool.length - 1)];
-      mainHero = createHistoricalHero(name, guessClassForHero(name));
-      markHeroActive(name);
-    } else {
-      mainHero = createRandomHero();
-    }
+    mainHero = createRandomHero();
   }
   const s = calcHeroStats(mainHero);
   const pos = randomWalkablePos();
@@ -1708,6 +2419,7 @@ function spawnEnemy() {
     heroName: mainHero.heroName, heroImg: mainHero.heroImg,
     cls: mainHero.cls, faction: faction,
     isHistorical: mainHero.isHistorical,
+    isNeutralNPC: false,
     level: mainHero.level || 1,
     rank: s.rank,
     trait: mainHero.trait || null,
@@ -1739,12 +2451,20 @@ function updateMap(dt) {
       p.x = targetWorld.x; p.y = targetWorld.y;
       p.gridCol = target.col; p.gridRow = target.row;
       p.pathIdx++;
-      G.moveSteps++;
+            G.moveSteps++;
+      
       if (G.moveSteps - G.lastSpawnStep >= ENEMY_SPAWN_INTERVAL) {
         G.lastSpawnStep = G.moveSteps;
         if (G.enemies.length < G.enemyCap) {
           spawnEnemy();
           log('远处传来兵戈声……');
+        }
+      }
+      // ★ 副本刷新
+      if (G.moveSteps - (G.lastDungeonRespawn || 0) >= DUNGEON_RESPAWN_STEPS) {
+        G.lastDungeonRespawn = G.moveSteps;
+        if (G.dungeons.length < DUNGEON_MAX) {
+          respawnDungeon();
         }
       }
       if (p.pathIdx >= p.path.length) {
@@ -1787,15 +2507,54 @@ function updateMap(dt) {
       }
     }
   }
-  for (const e of G.enemies) {
-    const isSameFaction = (G.playerFaction && e.faction === G.playerFaction);
-    if (!isSameFaction && p.invuln <= 0 && dist(e, p) < 30 && mode === STATE.MAP) {
+   for (const e of G.enemies) {
+    if (mode !== STATE.MAP) break;
+    if (p.invuln > 0) continue;
+    if (dist(e, p) >= 30) continue;
+
+    // 中立 NPC：直接打
+    if (e.isNeutralNPC) {
       startBattle(e);
       break;
+    }
+
+    // 阵营武将：看关系
+    const rel = G.factionRelations[e.faction] !== undefined ? G.factionRelations[e.faction] : 0;
+    const status = relationStatus(rel);
+    if (status === '死敌') {
+      startBattle(e);
+      break;
+   } else {
+      // 弹窗
+      if (typeof showEncounterDialog === 'function') {
+        showEncounterDialog(e);
+      } else {
+        // 还没加弹窗时兜底：直接打
+        startBattle(e);
+      }
+      break;
+  }
+  }
+      // ★ 检测副本触发
+  if (G.dungeonCooldown > 0) G.dungeonCooldown -= dt;
+  if (!G.pendingEncounter && !G.pendingDungeon && !G.currentDungeon && G.dungeonCooldown <= 0) {
+    let nearDun = null;
+    for (const d of G.dungeons) {
+      const dg = Math.abs(p.gridCol - d.col) + Math.abs(p.gridRow - d.row);
+      if (dg <= 1) { nearDun = d; break; }
+    }
+    if (nearDun) {
+      showDungeonEntryDialog(nearDun);
+      G.player.invuln = 2;
     }
   }
   // 检测最近的城池（用格子距离）
   let nearestCity = null;
+  
+  
+ 
+ 
+
   for (const city of G.cities) {
     const dg = Math.abs(p.gridCol - city.col) + Math.abs(p.gridRow - city.row);
     if (dg <= 1) { nearestCity = city; break; }
@@ -1815,6 +2574,7 @@ function updateMap(dt) {
 /* ======================== 大地图绘制 ======================== */
 
 function drawMap() {
+  document.getElementById('legendPanel').style.display = 'block';  
   ctx.fillStyle = '#1f2a18';
   ctx.fillRect(0, 0, W, H);
   ctx.save();
@@ -1870,6 +2630,37 @@ function drawMap() {
       drawMountainPeak(p.x, p.y, TILE_SIZE);
     }
   }
+  // ★ 绘制副本
+  for (const d of G.dungeons) {
+    const t = DUNGEON_TYPES[d.type];
+    const dp = gridToWorld(d.col, d.row);
+
+    ctx.beginPath();
+    ctx.arc(dp.x, dp.y, 40, 0, 7);
+    ctx.fillStyle = t.color + '33';
+    ctx.fill();
+
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(dp.x, dp.y, 36, 0, 7);
+    ctx.stroke();
+
+    ctx.font = '34px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(t.icon, dp.x, dp.y);
+    ctx.textBaseline = 'alphabetic';
+
+    ctx.fillStyle = t.color;
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(d.type, dp.x, dp.y + 34);
+
+    ctx.fillStyle = '#8a7a5a';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(d.layers + ' 层', dp.x, dp.y + 48);
+  }
+
   for (const city of G.cities) {
     const p = gridToWorld(city.col, city.row);
     const img = IMG[city.size];
@@ -1881,19 +2672,45 @@ function drawMap() {
     ctx.fillStyle = '#c9a96a'; ctx.font = '11px sans-serif';
     ctx.fillText(city.faction, p.x, p.y + sz/2 + 28);
   }
-  for (const e of G.enemies) {
+    for (const e of G.enemies) {
     const isSameFaction = (G.playerFaction && e.faction === G.playerFaction);
     const color = RANK_COLOR[e.rank] || '#888';
+
+    // ★ 阵营 + 关系
+    let relationLabel = '';
+    let relationCol = '#c9a96a';
+    if (e.isNeutralNPC) {
+      relationLabel = '中立';
+      relationCol = '#c9a96a';
+    } else if (isSameFaction) {
+      relationLabel = '友军';
+      relationCol = '#4caf50';
+    } else {
+      const rel = G.factionRelations[e.faction] !== undefined ? G.factionRelations[e.faction] : 0;
+      relationLabel = (e.faction === '中立') ? '中立' : (e.faction + '·' + relationStatus(rel));
+      relationCol = relationColor(rel);
+    }
+
+    // 底圈
     ctx.beginPath();
     ctx.arc(e.x, e.y - 4, 26, 0, 7);
     ctx.fillStyle = color + '33';
     ctx.fill();
+
+    // 立绘
     drawUnitSprite(ctx, e.cls, isSameFaction ? 'A' : 'B', e.x - 22, e.y - 28, 44, true);
-    const prefix = isSameFaction ? '【友】' : '';
+
+    // 阵营 + 关系（第一行）
+    ctx.fillStyle = relationCol;
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(relationLabel, e.x, e.y - 44);
+
+    // 名字（第二行）
     const star = e.isHistorical ? '★' : '';
     ctx.fillStyle = color;
-    ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(prefix + star + e.heroName, e.x, e.y - 32);
+    ctx.font = '10px sans-serif';
+    ctx.fillText(star + e.heroName, e.x, e.y - 30);
   }
   const p = G.player;
   if (p.moving && p.path.length > 0) {
@@ -1969,11 +2786,10 @@ function startBattle(enemy) {
     if (heroIdx === null || heroIdx === undefined) continue;
     if (heroIdx >= G.playerHeroes.length) continue;
     const h = G.playerHeroes[heroIdx];
-    if (h.dead) continue;   // 阵亡武将不上场
+    if (h.dead) continue;
     if (allies.some(a => a.heroIdx === heroIdx)) continue;
     const s = calcHeroStats(h);
     const pos = formationIndexToBattlePos(i);
-    // 用武将保存的 HP（可能未满）
     let curHp = (h.hp !== null && h.hp !== undefined) ? h.hp : s.hp;
     if (curHp <= 0) curHp = 1;
     allies.push({
@@ -1986,35 +2802,41 @@ function startBattle(enemy) {
       mov: s.mov, spd: s.spd, range: s.range,
       rank: s.rank, level: h.level || 1,
       trait: h.trait || null,
+      equips: h.equips || { '武器': null, '防具': null, '坐骑': null },   // ★
+      equipDodge: s.equipDodge || 0,   // ★
       killCount: 0, hasAttacked: false, movedDist: 0,
       acted: false
     });
     if (allies.length >= MAX_HEROES) break;
   }
 
-  const foeCount = enemy.enemyCount || 3;
-  const foeMainCls = enemy.cls || '步兵';
-  const foeGrowth = enemy.growth || RANK_GROWTH[enemy.rank] || RANK_GROWTH['名将'];
+    const foeCount = enemy.enemyCount || 3;
+  const main = enemy.mainHero || enemy;
+  const foeMainCls = main.cls || '步兵';
+  const foeGrowth = main.growth || RANK_GROWTH[main.rank] || RANK_GROWTH['名将'];
   const foeDummy = {
-    cls: foeMainCls, level: enemy.level || 1,
-    growth: foeGrowth, isHistorical: enemy.isHistorical,
-    trait: enemy.trait || null,
+    cls: foeMainCls, level: main.level || 1,
+    growth: foeGrowth, isHistorical: main.isHistorical,
+    trait: main.trait || null,
   };
   const foeStats = calcHeroStats(foeDummy);
   const foes = [{
-    id: 101, name: enemy.heroName, heroImg: enemy.heroImg,
-    isHistorical: enemy.isHistorical, cls: foeMainCls, team: 'B',
+    id: 101, name: main.heroName, heroImg: main.heroImg,
+    isHistorical: main.isHistorical, cls: foeMainCls, team: 'B',
     x: 9, y: 4, hp: foeStats.hp, maxHp: foeStats.hp,
     atk: foeStats.atk, def: foeStats.def,
     mov: foeStats.mov, spd: foeStats.spd, range: foeStats.range,
-    rank: foeStats.rank, level: enemy.level || 1,
-    trait: enemy.trait || null,
+    rank: foeStats.rank, level: main.level || 1,
+    trait: main.trait || null,
     killCount: 0, hasAttacked: false, movedDist: 0,
     acted: false
   }];
   const foePositions = [[9,4],[9,5],[10,6],[8,3],[8,6],[10,4]];
   for (let i = 1; i < foeCount; i++) {
     const h = createRandomHero();
+    if (enemy.isDungeon) {
+      h.level = Math.max(h.level || 1, 2 + (enemy.layer || 1) * 2);
+    }
     const s = calcHeroStats(h);
     const pos = foePositions[i] || [10, 5];
     foes.push({
@@ -2023,13 +2845,12 @@ function startBattle(enemy) {
       x: pos[0], y: pos[1], hp: s.hp, maxHp: s.hp,
       atk: s.atk, def: s.def,
       mov: s.mov, spd: s.spd, range: s.range,
-      rank: s.rank, level: 1,
+      rank: s.rank, level: h.level || 1,
       trait: h.trait || null,
       killCount: 0, hasAttacked: false, movedDist: 0,
       acted: false
     });
   }
-
   G.battle = {
     units: [...allies, ...foes],
     turn: 'A', selected: null, moveRange: [], path: [],
@@ -2260,9 +3081,23 @@ function calcDamage(attacker, defender, isCounter) {
   const defTrait = defender.trait ? TRAITS[defender.trait] : null;
   const mult = getCounterMultiplier(attacker.cls, defender.cls);
   let dmg = attacker.atk * mult;
+
+  // ★ 装备特效（攻方）
+  let ignoreDef = 0;
+  let firstStrike = false;
+  let bloodSuck = 0;
+  if (attacker.equips && attacker.equips['武器']) {
+    const w = attacker.equips['武器'];
+    if (w.name === '倚天剑') ignoreDef = 0.15;
+    if (w.name === '雌雄双股剑' && !attacker.hasAttacked) firstStrike = true;
+    if (w.name === '方天画戟') bloodSuck = 20;
+  }
+
   if (atkTrait) {
     if (atkTrait.ignoreDefRatio) {
       dmg -= defender.def * 0.5 * (1 - atkTrait.ignoreDefRatio);
+    } else if (ignoreDef > 0) {
+      dmg -= defender.def * 0.5 * (1 - ignoreDef);
     } else {
       dmg -= defender.def * 0.5;
     }
@@ -2278,26 +3113,66 @@ function calcDamage(attacker, defender, isCounter) {
     if (atkTrait.counterBonus && mult > 1) dmg *= 1 + atkTrait.counterBonus;
     if (isCounter && atkTrait.counterMult) dmg *= atkTrait.counterMult;
   } else {
-    dmg -= defender.def * 0.5;
+    if (ignoreDef > 0) {
+      dmg -= defender.def * 0.5 * (1 - ignoreDef);
+    } else {
+      dmg -= defender.def * 0.5;
+    }
   }
+
+  // ★ 雌雄双股剑 首次攻击 +30%
+  if (firstStrike) dmg *= 1.30;
+
+  // ★ 兽面吞头铠：HP<30% 防御 +50%
+  if (defender.equips && defender.equips['防具']) {
+    const a = defender.equips['防具'];
+    if (a.name === '兽面吞头铠' && defender.hp / defender.maxHp < 0.30) {
+      dmg -= defender.def * 0.5 * 0.5;
+    }
+    // ★ 黄金锁子甲：受伤 -15%
+    if (a.name === '黄金锁子甲') dmg *= 0.85;
+  }
+
   if (defTrait) {
     if (defTrait.takeDamageMult) dmg *= defTrait.takeDamageMult;
     if (defTrait.lowHpDefMult && defender.hp / defender.maxHp < 0.30) {
       dmg -= defender.def * 0.5 * (defTrait.lowHpDefMult - 1);
     }
   }
+
+  // ★ 白银狮子甲：免疫克制减伤（克制倍率按 1.0 算）
+  let finalMult = mult;
+  if (defender.equips && defender.equips['防具'] && defender.equips['防具'].name === '白银狮子甲') {
+    if (finalMult < 1) {
+      // 本来是 0.7 的，改成 1.0（不减伤）
+      dmg = dmg / finalMult;
+      finalMult = 1.0;
+    }
+  }
+
+  // 卧龙光环
   if (teamHasAura(defender.team, '卧龙') && defender.trait !== '卧龙') {
     dmg *= 0.90;
   }
+
   dmg = Math.max(1, Math.round(dmg + rand(-3, 3)));
-  return { dmg, mult };
+  return { dmg, mult: finalMult, bloodSuck: bloodSuck };
 }
+   
 
 function calcDodgeRateEx(defender, attacker) {
   let base = calcDodgeRate(defender, attacker);
   const defTrait = defender.trait ? TRAITS[defender.trait] : null;
   if (defTrait && defTrait.dodgeBonus) base += defTrait.dodgeBonus;
-  return Math.min(0.50, base);
+  // ★ 装备闪避
+  if (defender.equipDodge) base += defender.equipDodge;
+  // 赤兔马 / 的卢马 额外闪避
+  if (defender.equips) {
+    const mount = defender.equips['坐骑'];
+    if (mount && mount.name === '赤兔马') base += 0.10;
+    if (mount && mount.name === '的卢马') base += 0.15;
+  }
+  return Math.min(0.60, base);   // ★ 上限改成 60%
 }
 
 function resolveOneAttack(atk, def, isCounter) {
@@ -2308,7 +3183,7 @@ function resolveOneAttack(atk, def, isCounter) {
     return { dodged: true, dmg: 0 };
   }
   const r = calcDamage(atk, def, isCounter);
-  return { dodged: false, dmg: r.dmg, mult: r.mult };
+  return { dodged: false, dmg: r.dmg, mult: r.mult, bloodSuck: r.bloodSuck || 0 };
 }
 
 function applySplash(attacker, target, mainDmg) {
@@ -2364,6 +3239,34 @@ function doAttack(attacker, defender) {
         const multText = (result.mult > 1) ? '（克制）' : (result.mult < 1) ? '（被克）' : '';
         log(unitDisplayShort(attacker) + ' 对 ' + unitDisplayShort(defender) + ' 造成 ' + result.dmg + ' 伤害' + multText);
         applySplash(attacker, defender, result.dmg);
+
+        // ★ 青龙偃月刀：15% 斩杀
+        if (attacker.equips && attacker.equips['武器'] && attacker.equips['武器'].name === '青龙偃月刀') {
+          if (defender.hp > 0 && Math.random() < 0.15) {
+            const extra = Math.round(result.dmg * 0.5);
+            defender.hp -= extra;
+            log('【斩杀】' + unitDisplayShort(attacker) + ' 额外造成 ' + extra + ' 伤害');
+          }
+        }
+        // ★ 丈八蛇矛：20% 溅射
+        if (attacker.equips && attacker.equips['武器'] && attacker.equips['武器'].name === '丈八蛇矛') {
+          const splashTargets = G.battle.units.filter(u =>
+            u.hp > 0 && u.team !== attacker.team && u !== defender &&
+            Math.abs(u.x - defender.x) + Math.abs(u.y - defender.y) === 1
+          );
+          for (const t of splashTargets) {
+            const sd = Math.max(1, Math.round(result.dmg * 0.2));
+            t.hp -= sd;
+            log('【蛇影】溅射 ' + unitDisplayShort(t) + ' -' + sd);
+            if (t.hp <= 0) { t.hp = 0; log(unitDisplayShort(t) + ' 被溅射击败'); }
+          }
+        }
+        // ★ 方天画戟：击杀后恢复 20
+        if (defender.hp <= 0 && attacker.equips && attacker.equips['武器'] && attacker.equips['武器'].name === '方天画戟') {
+          const before = attacker.hp;
+          attacker.hp = Math.min(attacker.maxHp, attacker.hp + 20);
+          log('【饮血】' + unitDisplayShort(attacker) + ' 恢复 ' + (attacker.hp - before) + ' HP');
+        }
       }
       if (defender.hp > 0 && counterResult) {
         if (counterResult.dodged) {
@@ -2371,6 +3274,12 @@ function doAttack(attacker, defender) {
         } else {
           attacker.hp -= counterResult.dmg;
           log(unitDisplayShort(defender) + ' 反击，造成 ' + counterResult.dmg + ' 伤害');
+          // ★ 绝影：反击时 +20%
+          if (defender.equips && defender.equips['坐骑'] && defender.equips['坐骑'].name === '绝影') {
+            const extra = Math.round(counterResult.dmg * 0.2);
+            attacker.hp -= extra;
+            log('【无双】绝影额外 ' + extra + ' 伤害');
+          }
         }
       }
       if (defender.hp <= 0) {
@@ -2432,6 +3341,7 @@ function tryRetreat() {
 }
 
 /* ★ 战后结算 + 阵亡处理 + 金币掉落 */
+/* ★ 战后结算 + 阵亡处理 + 金币掉落 */
 function exitBattle(byRetreat, wasWin) {
   const b = G.battle;
   if (!b) return;
@@ -2439,21 +3349,28 @@ function exitBattle(byRetreat, wasWin) {
   const alliesAlive = b.units.filter(u => u.team === 'A' && u.hp > 0);
   const alliesDead = b.units.filter(u => u.team === 'A' && u.hp <= 0);
 
-  // 收集结果信息
   let resultRows = [];
   let goldGain = 0;
   let levelUpMsgs = [];
   let deadMsgs = [];
 
   if (wasWin) {
-    // 金币掉落
     const foeCount = b.units.filter(u => u.team === 'B').length;
     goldGain = 50 + Math.max(0, foeCount - 2) * 50;
     if (enemyRef && enemyRef.isHistorical) goldGain += 100;
     if (enemyRef && enemyRef.rank === '神将') goldGain += 500;
     addGold(goldGain);
 
-    // 经验 + 升级
+    let dropRate = 0.25;
+    if (enemyRef && enemyRef.isHistorical) dropRate += 0.10;
+    if (enemyRef && enemyRef.rank === '神将') dropRate += 0.30;
+    if (Math.random() < dropRate) {
+      const eq = generateEquip();
+      G.equipments.push(eq);
+      resultRows.push('获得装备：<span style="color:' + eq.color + '">' + eq.name + '</span>');
+      log('🎁 掉落装备：' + eq.name);
+    }
+
     for (const u of alliesAlive) {
       if (u.heroIdx === undefined) continue;
       const hero = G.playerHeroes[u.heroIdx];
@@ -2468,40 +3385,51 @@ function exitBattle(byRetreat, wasWin) {
       }
       if ((hero.level || 1) >= maxLevel()) hero.exp = 0;
     }
-    // 敌方历史武将冷却
-    if (enemyRef && enemyRef.isHistorical && enemyRef.heroName) {
-      markHeroCooldown(enemyRef.heroName);
+
+    const refMain = enemyRef && (enemyRef.mainHero || enemyRef);   
+      if (refMain && refMain.isHistorical && refMain.heroName) {
+      markHeroCooldown(refMain.heroName);
     }
-    // 俘虏判定
-    const foeMain = b.units.find(x => x.team === 'B' && x.id === 101);
-    if (foeMain && foeMain.isHistorical && foeMain.hp <= 0) {
-      const capRate = 0.05;
+
+        // ★ 俘虏判定：任意敌方武将，每个独立判定
+    const foeUnits = b.units.filter(x => x.team === 'B' && x.hp <= 0);
+    for (const foe of foeUnits) {
+      let capRate = 0.25;
+      if (foe.isHistorical) capRate += 0.15;
+      if (foe.id === 101) capRate += 0.10;
       if (Math.random() < capRate) {
+        const exist = G.capturedHeroes.some(c => c.heroName === foe.name && c.faction === (enemyRef ? enemyRef.faction : null));
+        if (exist) continue;
         G.capturedHeroes.push({
-          heroName: foeMain.name, heroImg: foeMain.heroImg,
-          cls: foeMain.cls, isHistorical: true
+          heroName: foe.name,
+          heroImg: foe.heroImg,
+          cls: foe.cls,
+          isHistorical: foe.isHistorical,
+          rank: foe.rank || '良将',
+          level: foe.level || 1,
+          trait: foe.trait || null,
+          faction: enemyRef ? enemyRef.faction : null,
+          recruitCooldown: 0,
         });
-        resultRows.push('俘虏了 <span style="color:#ffdd55">★' + foeMain.name + '</span>');
+        const star = foe.isHistorical ? '★' : '';
+        resultRows.push('俘虏了 <span style="color:#ffdd55">' + star + foe.name + '</span>');
+        log('🎖 俘虏了 ' + star + foe.name);
       }
     }
   }
 
-  // 处理我方所有参战武将的战后状态
   for (const u of b.units.filter(x => x.team === 'A')) {
     if (u.heroIdx === undefined) continue;
     const hero = G.playerHeroes[u.heroIdx];
     if (!hero) continue;
     if (u.hp <= 0) {
-      // 阵亡
       hero.dead = true;
       hero.hp = 0;
       deadMsgs.push(heroPlainName(hero));
-      // 从九宫格里移除
       for (let k = 0; k < G.formation.length; k++) {
         if (G.formation[k] === u.heroIdx) G.formation[k] = null;
       }
     } else {
-      // 存活：恢复 50% 最大 HP（至少 1）
       const recovered = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.5));
       hero.hp = Math.max(1, recovered);
       hero.maxHp = u.maxHp;
@@ -2509,10 +3437,8 @@ function exitBattle(byRetreat, wasWin) {
     }
   }
 
-  // 保存阵型（阵亡武将已被移除）
   saveFormation();
 
-  // 关闭战斗
   G.battle = null;
   G.anim = null;
   mode = STATE.MAP;
@@ -2539,17 +3465,28 @@ function exitBattle(byRetreat, wasWin) {
     }
     G.player.invuln = 3;
   }
+
   if (wasWin && enemyRef) {
-    const idx = G.enemies.indexOf(enemyRef);
-    if (idx >= 0) G.enemies.splice(idx, 1);
+    if (enemyRef.isDungeon) {
+      const dungeon = enemyRef.dungeon;
+      const layer = enemyRef.layer || 1;
+      showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, resultRows, function () {
+        setTimeout(function () {
+          if (!G.battle) showDungeonLayerDialog(dungeon, layer);
+        }, 200);
+      });
+      return;
+    } else {
+      const idx = G.enemies.indexOf(enemyRef);
+      if (idx >= 0) G.enemies.splice(idx, 1);
+      setTimeout(function () { checkVictory(); }, 200);
+    }
   }
 
-  // 显示结算界面
   showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, resultRows);
 }
-
-function showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, extraRows) {
-  const titleEl = document.getElementById('resultTitle');
+ function showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, extraRows, onClose) { 
+const titleEl = document.getElementById('resultTitle');
   const contentEl = document.getElementById('resultContent');
   titleEl.className = 'resultTitle';
   if (byRetreat) {
@@ -2565,6 +3502,7 @@ function showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, ex
   let html = '';
   if (wasWin) {
     html += `<div class="resultRow"><span class="resultLabel">获得金币：</span><span class="resultGold">+${goldGain}</span></div>`;
+    html += `<div class="resultRow"><span class="resultLabel">获得经验：</span><span style="color:#4caf50;">每位存活武将 +1</span></div>`;
   }
   if (extraRows && extraRows.length) {
     for (const r of extraRows) {
@@ -2587,11 +3525,15 @@ function showResultScreen(wasWin, byRetreat, goldGain, levelUpMsgs, deadMsgs, ex
   }
   if (!html) html = '<div class="resultRow" style="text-align:center;color:#8a7a5a;">没有变化</div>';
   contentEl.innerHTML = html;
-  document.getElementById('resultScreen').style.display = 'flex';
+    document.getElementById('resultScreen').style.display = 'flex';
+  G._resultOnClose = onClose || null;
 }
 
 document.getElementById('resultOk').onclick = () => {
   document.getElementById('resultScreen').style.display = 'none';
+  const cb = G._resultOnClose;
+  G._resultOnClose = null;
+  if (typeof cb === 'function') cb();
 };
 
 function checkBattleEnd() {
@@ -2938,6 +3880,7 @@ function enemyAI() {
 }
 
 function drawBattle() {
+  document.getElementById('legendPanel').style.display = 'none';
   const b = G.battle;
   if (!b) return;
   ctx.fillStyle = '#2a3a28';
@@ -3064,9 +4007,19 @@ function enterCity(city) {
   G.inCity = city;
   document.getElementById('cityName').textContent = city.name;
   document.getElementById('cityFaction').textContent = city.faction;
-  if (!G.cityTavern || G.cityTavern.city !== city) {
-    G.cityTavern = { city: city, heroes: rollTavernHeroes() };
+
+  // ★ 酒馆：每城独立刷新
+  if (!city.tavernData || (G.moveSteps - city.tavernData.refreshStep) >= 100) {
+    city.tavernData = { heroes: rollTavernHeroes(), refreshStep: G.moveSteps };
   }
+  G.cityTavern = { city: city, heroes: city.tavernData.heroes };
+
+  // ★ 商店：每城独立刷新
+  if (!city.shopData || (G.moveSteps - city.shopData.refreshStep) >= 100) {
+    city.shopData = { equips: rollShopEquips(), refreshStep: G.moveSteps };
+  }
+  G.cityShop = { city: city, equips: city.shopData.equips };
+
   showCityMenu();
   document.getElementById('cityScreen').style.display = 'flex';
 }
@@ -3095,6 +4048,7 @@ function openCityPanel(tab) {
     renderHospital(contentEl);
   } else if (tab === 'shop') {
     titleEl.textContent = '商 店';
+     
     renderShop(contentEl);
   }
 }
@@ -3169,7 +4123,8 @@ function renderTavern(container) {
       if (G.gold < 50) return;
       G.gold -= 50;
       updateGoldUI();
-      G.cityTavern = { city: G.cityTavern.city, heroes: rollTavernHeroes() };
+      G.inCity.tavernData = { heroes: rollTavernHeroes(), refreshStep: G.moveSteps };
+G.cityTavern = { city: G.inCity, heroes: G.inCity.tavernData.heroes };
       log('刷新了酒馆（-50 金）');
       renderTavern(container);
     };
@@ -3258,9 +4213,102 @@ function renderHospital(container) {
 }
 
 function renderShop(container) {
-  container.innerHTML = '<div class="emptyShop">🛒<br><br>商 店 暂 未 开 放<br><br>（装 备 系 统 将 在 后 续 版 本 加 入）</div>';
+  container.innerHTML = '';
+  if (!G.cityShop) {
+    G.cityShop = { city: G.inCity, equips: rollShopEquips() };
+  }
+  const grid = document.createElement('div');
+  grid.className = 'shopGrid';
+  for (let i = 0; i < G.cityShop.equips.length; i++) {
+    const eq = G.cityShop.equips[i];
+    const canAfford = G.gold >= eq.price && !eq.sold;
+    const partIcon = EQUIP_PARTS[eq.part] ? EQUIP_PARTS[eq.part].icon : '?';
+    let statHtml = '';
+    if (eq.atk) statHtml += `攻 +${eq.atk}　`;
+    if (eq.def) statHtml += `防 +${eq.def}　`;
+    if (eq.hp) statHtml += `HP +${eq.hp}　`;
+    if (eq.mov) statHtml += `移动 +${eq.mov}　`;
+    if (eq.dodge) statHtml += `闪避 +${Math.round(eq.dodge * 100)}%`;
+    const specialHtml = eq.special
+      ? `<div class="traitBox">【${eq.special.name}】${eq.special.desc}</div>`
+      : '';
+    const card = document.createElement('div');
+    card.className = 'shopCard';
+    card.style.borderColor = eq.color;
+    if (eq.sold) card.style.opacity = 0.4;
+    card.innerHTML = `
+      <div class="icon" style="font-size:36px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:rgba(20,14,8,.8);border-radius:8px;flex-shrink:0;">${partIcon}</div>
+      <div class="info">
+        <div class="name" style="color:${eq.color}">${eq.name}</div>
+        <div class="cls">【${eq.rank}】${eq.part}</div>
+        <div class="stat">${statHtml}</div>
+        ${specialHtml}
+        <div class="price">💰 ${eq.price}</div>
+        ${eq.sold
+          ? '<div class="soldTag">已 售 出</div>'
+          : `<button class="buyBtn" data-buy="${i}" ${canAfford ? '' : 'disabled'}>购 买</button>`
+        }
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  container.appendChild(grid);
+
+  // 刷新按钮
+  const refreshBar = document.createElement('div');
+  refreshBar.className = 'refreshBar';
+  refreshBar.innerHTML = `
+    <span style="color:#8a7a5a;font-size:13px;">刷新商店需 50 金</span>
+    <button class="saveBtn" id="shopRefreshBtn" ${G.gold >= 50 ? '' : 'disabled'}>刷 新（50 金）</button>
+  `;
+  container.appendChild(refreshBar);
+
+  // 购买按钮
+  container.querySelectorAll('button[data-buy]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.buy);
+      const eq = G.cityShop.equips[idx];
+      if (eq.sold) return;
+      if (G.gold < eq.price) {
+        showToast('金币不足', 1000);
+        return;
+      }
+      G.gold -= eq.price;
+      updateGoldUI();
+      eq.sold = true;
+      // 加入包裹（去掉 sold 标记，作为新装备）
+      const newEq = Object.assign({}, eq);
+      delete newEq.sold;
+      G.equipments.push(newEq);
+      log('购买了 ' + eq.name + '（-' + eq.price + ' 金）');
+      showToast('购得 ' + eq.name, 1200);
+      renderShop(container);
+    };
+  });
+
+  // 刷新
+  const refreshBtn = document.getElementById('shopRefreshBtn');
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      if (G.gold < 50) return;
+      G.gold -= 50;
+      updateGoldUI();
+      G.inCity.shopData = { equips: rollShopEquips(), refreshStep: G.moveSteps };
+G.cityShop = { city: G.inCity, equips: G.inCity.shopData.equips };
+      log('刷新了商店（-50 金）');
+      renderShop(container);
+    };
+  }
 }
 
+/* 生成商店 4 件装备 */
+function rollShopEquips() {
+  const result = [];
+  for (let i = 0; i < 4; i++) {
+    result.push(generateEquip());
+  }
+  return result;
+}
 document.getElementById('enterCityBtn').onclick = () => {
   if (G.currentCity) enterCity(G.currentCity);
 };
@@ -3293,6 +4341,7 @@ function switchCampTab(tab) {
   else if (tab === 'captives') renderCaptivesTab(panel);
   else if (tab === 'formation') renderFormationTab(panel);
   else if (tab === 'inventory') renderInventoryTab(panel);
+  else if (tab === 'diplomacy') renderDiplomacyTab(panel);
   else if (tab === 'save') renderSaveTab(panel);
 }
 
@@ -3315,8 +4364,19 @@ function renderHeroesTab(panel) {
     const traitHtml = trait
       ? `<div class="traitBox"><span class="traitName">【${trait.name}】</span>${trait.desc}</div>`
       : '';
-    const curHp = h.dead ? 0 : ((h.hp !== null && h.hp !== undefined) ? h.hp : s.hp);
+        const curHp = h.dead ? 0 : ((h.hp !== null && h.hp !== undefined) ? h.hp : s.hp);
     const isDead = h.dead;
+    // ★ 已装备的装备名
+    let equipHtml = '';
+    if (h.equips) {
+      const parts = [];
+      if (h.equips['武器']) parts.push(`<span style="color:${h.equips['武器'].color}">⚔${h.equips['武器'].name}</span>`);
+      if (h.equips['防具']) parts.push(`<span style="color:${h.equips['防具'].color}">🛡${h.equips['防具'].name}</span>`);
+      if (h.equips['坐骑']) parts.push(`<span style="color:${h.equips['坐骑'].color}">🐴${h.equips['坐骑'].name}</span>`);
+      if (parts.length) {
+        equipHtml = `<div class="stat" style="border-top:1px dashed #6b5333;margin-top:6px;padding-top:6px;">${parts.join('　')}</div>`;
+      }
+    }
     const card = document.createElement('div');
     card.className = 'heroCard' + (isDead ? ' dead' : '');
     card.style.borderColor = isDead ? '#666' : color;
@@ -3337,44 +4397,209 @@ function renderHeroesTab(panel) {
         </div>
         <div class="stat" style="color:#8a7a5a;font-size:11px;">评分 ${score}（${s.rank}档）</div>
         ${traitHtml}
+        ${equipHtml}
+                <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="saveBtn" style="padding:6px 14px;font-size:12px;" data-equip-hero="${G.playerHeroes.indexOf(h)}">装 备</button>
+          <button style="padding:6px 14px;font-size:12px;background:#5a2020;border-color:#c0392b;" data-dismiss-hero="${G.playerHeroes.indexOf(h)}">解 雇</button>
+        </div>
       </div>
     `;
     grid.appendChild(card);
   }
   panel.appendChild(grid);
+  // 装备按钮
+  panel.querySelectorAll('button[data-equip-hero]').forEach(btn => {
+    btn.onclick = () => {
+      const heroIdx = parseInt(btn.dataset.equipHero);
+      openEquipScreen(heroIdx);
+    };
+  });
+  // ★ 解雇按钮
+  panel.querySelectorAll('button[data-dismiss-hero]').forEach(btn => {
+    btn.onclick = () => {
+      const heroIdx = parseInt(btn.dataset.dismissHero);
+      const h = G.playerHeroes[heroIdx];
+      if (!h) return;
+
+      // 至少保留 1 名武将
+      if (G.playerHeroes.length <= 1) {
+        showToast('至少需要保留 1 名武将', 1200);
+        return;
+      }
+
+      const name = (h.isHistorical ? '★' : '') + h.heroName;
+      if (!confirm('确定解雇 ' + name + '？\n身上的装备会退回包裹。')) return;
+
+      // 装备退回包裹
+      if (h.equips) {
+        for (const part of ['武器', '防具', '坐骑']) {
+          if (h.equips[part]) {
+            G.equipments.push(h.equips[part]);
+            h.equips[part] = null;
+          }
+        }
+      }
+
+      // 从九宫格移除
+      for (let k = 0; k < G.formation.length; k++) {
+        if (G.formation[k] === heroIdx) G.formation[k] = null;
+      }
+
+      // 移除武将，并修正 formation 索引
+      const removedIdx = heroIdx;
+      G.playerHeroes.splice(removedIdx, 1);
+      for (let k = 0; k < G.formation.length; k++) {
+        if (G.formation[k] !== null && G.formation[k] > removedIdx) {
+          G.formation[k] -= 1;
+        }
+      }
+
+      saveFormation();
+      log('解雇了 ' + name);
+      showToast('已解雇 ' + h.heroName, 1200);
+
+      panel.innerHTML = '';
+      renderHeroesTab(panel);
+    };
+  });
 }
 
 function renderCaptivesTab(panel) {
-  if (!G.capturedHeroes.length) {
-    panel.innerHTML = '<div style="color:#8a7a5a">暂无俘虏。</div>';
+panel.innerHTML = '';  
+if (!G.capturedHeroes.length) {
+    panel.innerHTML = '<div style="color:#8a7a5a;text-align:center;padding:40px 20px;letter-spacing:2px;">暂 无 俘 虏</div>';
     return;
   }
   const grid = document.createElement('div');
   grid.className = 'heroGrid';
+
   for (let i = 0; i < G.capturedHeroes.length; i++) {
     const c = G.capturedHeroes[i];
     const card = document.createElement('div');
     card.className = 'capCard';
     const star = c.isHistorical ? '★' : '';
+    const rank = c.rank || '良将';
+    const color = RANK_COLOR[rank] || '#c9a96a';
+
+    // ★ 招降成功率（按品级）
+    const rankChance = {
+      '凡将': 0.90, '良将': 0.75, '名将': 0.55, '上将': 0.35, '神将': 0.15,
+    };
+    const chance = rankChance[rank] || 0.5;
+    const cooldown = c.recruitCooldown || 0;
+    const canRecruit = cooldown <= G.moveSteps;
+
+    // ★ 释放收益（按品级）
+    const rankGold = {
+      '凡将': [10, 30], '良将': [30, 80], '名将': [80, 200],
+      '上将': [200, 500], '神将': [500, 1500],
+    };
+    const goldRange = rankGold[rank] || [50, 100];
+    const equipChance = {
+      '凡将': 0.05, '良将': 0.10, '名将': 0.20, '上将': 0.35, '神将': 0.60,
+    }[rank] || 0.1;
+
+    let recruitBtn;
+    if (!canRecruit) {
+      const stepsLeft = cooldown - G.moveSteps;
+      recruitBtn = `<button disabled style="padding:6px 14px;font-size:12px;">冷却 ${stepsLeft} 步</button>`;
+    } else {
+      recruitBtn = `<button class="saveBtn" data-recruit="${i}" style="padding:6px 14px;font-size:12px;background:#2a5a2a;border-color:#4caf50;">招 降 ${Math.round(chance*100)}%</button>`;
+    }
+
     card.innerHTML = `
-      <img class="head" src="${c.heroImg || ''}" alt="">
+      <img class="head" src="${c.heroImg || ''}" alt="" style="border-color:${color}">
       <div class="info">
-        <div class="name">${star}${c.heroName}</div>
-        <div class="cls">${c.cls || ''}</div>
+        <div class="name" style="color:${color}">${star}${c.heroName}</div>
+        <div class="cls">【${rank}】${c.cls || ''}${c.faction ? ' · ' + c.faction : ''}</div>
+        <div style="color:#8a7a5a;font-size:11px;margin-top:4px;">
+          释放得 ${goldRange[0]}~${goldRange[1]} 金　掉落 ${Math.round(equipChance*100)}% 装备
+        </div>
+        <div style="color:${canRecruit ? '#4caf50' : '#e67e22'};font-size:11px;margin-top:2px;">
+          ${canRecruit ? '可立即招降' : '招降冷却中（还需 ' + (cooldown - G.moveSteps) + ' 步）'}
+        </div>
       </div>
       <div class="btns">
-        <button data-release="${i}">释 放</button>
+        ${recruitBtn}
+        <button data-release="${i}" style="padding:6px 14px;font-size:12px;">释 放</button>
       </div>
     `;
     grid.appendChild(card);
   }
   panel.appendChild(grid);
+
+  // ★ 招降
+  panel.querySelectorAll('button[data-recruit]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.recruit);
+      const c = G.capturedHeroes[idx];
+      if (!c) return;
+      if ((c.recruitCooldown || 0) > G.moveSteps) return;
+
+      const rank = c.rank || '良将';
+      const rankChance = {
+        '凡将': 0.90, '良将': 0.75, '名将': 0.55, '上将': 0.35, '神将': 0.15,
+      };
+      const chance = rankChance[rank] || 0.5;
+
+      if (Math.random() < chance) {
+        let newHero;
+        if (c.isHistorical) {
+          newHero = createHistoricalHero(c.heroName, c.cls);
+        } else {
+          newHero = createRandomHero();
+          newHero.heroName = c.heroName;
+          newHero.heroImg = c.heroImg;
+          newHero.cls = c.cls;
+        }
+        newHero.level = c.level || 1;
+        if (c.trait) newHero.trait = c.trait;
+
+        G.playerHeroes.push(newHero);
+        G.capturedHeroes.splice(idx, 1);
+        const star = c.isHistorical ? '★' : '';
+        log('招降成功！' + star + c.heroName + ' 加入队伍');
+        showToast(c.heroName + ' 加入队伍！', 1500);
+      } else {
+        c.recruitCooldown = G.moveSteps + 50;
+        log('招降 ' + c.heroName + ' 失败，需等 50 步后再试');
+        showToast('招降失败，稍后再试', 1200);
+      }
+      renderCaptivesTab(panel);
+    };
+  });
+
+  // ★ 释放
   panel.querySelectorAll('button[data-release]').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.release);
-      const name = G.capturedHeroes[idx].heroName;
+      const c = G.capturedHeroes[idx];
+      if (!c) return;
+
+      const rank = c.rank || '良将';
+      const rankGold = {
+        '凡将': [10, 30], '良将': [30, 80], '名将': [80, 200],
+        '上将': [200, 500], '神将': [500, 1500],
+      };
+      const goldRange = rankGold[rank] || [50, 100];
+      const gold = randInt(goldRange[0], goldRange[1]);
+      addGold(gold);
+
+      const equipChance = {
+        '凡将': 0.05, '良将': 0.10, '名将': 0.20, '上将': 0.35, '神将': 0.60,
+      }[rank] || 0.1;
+
+      let msg = '释放了 ' + (c.isHistorical ? '★' : '') + c.heroName + '（+' + gold + ' 金）';
+      if (Math.random() < equipChance) {
+        const part = ['武器', '防具', '坐骑'][randInt(0, 2)];
+        const rankMap = { '凡将':'凡品', '良将':'良品', '名将':'名品', '上将':'上品', '神将':'神品' };
+        const eq = generateEquip(part, rankMap[rank] || '名品');
+        G.equipments.push(eq);
+        msg += '　获赠 <span style="color:' + eq.color + '">' + eq.name + '</span>';
+      }
+      log(msg);
+      showToast('释放 ' + c.heroName + '，+' + gold + ' 金', 1200);
       G.capturedHeroes.splice(idx, 1);
-      log('释放了 ' + name);
       renderCaptivesTab(panel);
     };
   });
@@ -3573,35 +4798,88 @@ function refreshFormationTab() {
 
 function renderInventoryTab(panel) {
   const wrap = document.createElement('div');
-  wrap.style.maxWidth = '700px';
+  wrap.style.maxWidth = '900px';
   wrap.style.margin = '0 auto';
 
+  // 金币区
   const goldBox = document.createElement('div');
   goldBox.style.cssText = `
     background: linear-gradient(135deg, rgba(80,60,20,.9), rgba(40,30,10,.9));
     border: 2px solid #c9a96a; border-radius: 12px;
-    padding: 20px; margin-bottom: 24px; text-align: center;
+    padding: 16px; margin-bottom: 20px; text-align: center;
   `;
   goldBox.innerHTML = `
-    <div style="font-size:14px;color:#c9a96a;letter-spacing:4px;margin-bottom:8px;">当 前 金 币</div>
-    <div style="font-size:42px;color:#ffdd55;letter-spacing:2px;">💰 ${G.gold}</div>
+    <div style="font-size:13px;color:#c9a96a;letter-spacing:4px;margin-bottom:6px;">当 前 金 币</div>
+    <div style="font-size:36px;color:#ffdd55;letter-spacing:2px;">💰 ${G.gold}</div>
   `;
   wrap.appendChild(goldBox);
 
-  const equipBox = document.createElement('div');
-  equipBox.style.cssText = `
-    background: rgba(30,20,10,.6);
-    border: 1px dashed #6b5333; border-radius: 12px;
-    padding: 60px 20px; text-align: center;
-    color: #8a7a5a; font-size: 15px; line-height: 2;
-    letter-spacing: 2px;
-  `;
-  equipBox.innerHTML = `
-    <div style="font-size:40px;margin-bottom:12px;">🎒</div>
-    <div>未 装 备 的 装 备</div>
-    <div style="font-size:12px;margin-top:8px;">（装 备 系 统 将 在 后 续 版 本 加 入）</div>
-  `;
-  wrap.appendChild(equipBox);
+  // 装备区
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:14px;color:#c9a96a;letter-spacing:2px;margin-bottom:12px;';
+  title.textContent = `未装备的装备（${G.equipments.length}）`;
+  wrap.appendChild(title);
+
+  if (!G.equipments.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = `
+      background: rgba(30,20,10,.6);
+      border: 1px dashed #6b5333; border-radius: 12px;
+      padding: 40px 20px; text-align: center;
+      color: #8a7a5a; font-size: 14px; letter-spacing: 2px;
+    `;
+    empty.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">🎒</div>空 空 如 也';
+    wrap.appendChild(empty);
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'equipGrid';
+    for (let i = 0; i < G.equipments.length; i++) {
+      const eq = G.equipments[i];
+      const card = document.createElement('div');
+      card.className = 'equipCard';
+      card.style.borderColor = eq.color;
+      const partIcon = EQUIP_PARTS[eq.part] ? EQUIP_PARTS[eq.part].icon : '?';
+      let statHtml = '';
+      if (eq.atk) statHtml += `攻 +${eq.atk}　`;
+      if (eq.def) statHtml += `防 +${eq.def}　`;
+      if (eq.hp) statHtml += `HP +${eq.hp}　`;
+      if (eq.mov) statHtml += `移动 +${eq.mov}　`;
+      if (eq.dodge) statHtml += `闪避 +${Math.round(eq.dodge * 100)}%`;
+      const specialHtml = eq.special
+        ? `<div class="special">【${eq.special.name}】${eq.special.desc}</div>`
+        : '';
+      card.innerHTML = `
+        <div class="icon">${partIcon}</div>
+        <div class="info">
+          <div class="name" style="color:${eq.color}">${eq.name}</div>
+          <div class="part">【${eq.rank}】${eq.part}</div>
+          <div class="stat">${statHtml}</div>
+          ${specialHtml}
+          <button class="sellBtn" data-sell="${i}">卖 出（${Math.floor(eq.price * 0.5)} 金）</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+    wrap.appendChild(grid);
+
+    // 卖出事件
+    grid.querySelectorAll('button[data-sell]').forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.sell);
+        const eq = G.equipments[idx];
+        const price = Math.floor(eq.price * 0.5);
+        if (!confirm(`确定卖出「${eq.name}」？\n获得 ${price} 金`)) return;
+        addGold(price);
+        G.equipments.splice(idx, 1);
+        log('卖出了 ' + eq.name + '（+' + price + ' 金）');
+        showToast('+' + price + ' 金', 1000);
+        // 刷新包裹页
+        const panel = document.getElementById('campPanel');
+        panel.innerHTML = '';
+        renderInventoryTab(panel);
+      };
+    });
+  }
 
   panel.appendChild(wrap);
 }
@@ -3610,55 +4888,218 @@ function renderSaveTab(panel) {
   panel.innerHTML = '';
   const wrap = document.createElement('div');
   wrap.className = 'savePanel';
-  const data = loadSaveData();
-  let infoHtml = '';
-  if (data) {
-    const d = new Date(data.savedAt);
-    const timeStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    infoHtml = `
-      <div><span class="label">阵营：</span><span class="value">${data.playerFaction || '未知'}</span></div>
-      <div><span class="label">金币：</span><span class="value">${data.gold || 0}</span></div>
-      <div><span class="label">天数：</span><span class="value">第 ${data.day || 1} 天</span></div>
-      <div><span class="label">武将：</span><span class="value">${(data.playerHeroes || []).length} 人</span></div>
-      <div><span class="label">俘虏：</span><span class="value">${(data.capturedHeroes || []).length} 人</span></div>
-      <div><span class="label">存档时间：</span><span class="value">${timeStr}</span></div>
-    `;
-  } else {
-    infoHtml = '<div class="empty">暂 无 存 档</div>';
-  }
-  wrap.innerHTML = `
-    <div class="saveInfo">${infoHtml}</div>
-    <div class="saveActions">
-      <button class="saveAction" id="doSaveBtn">保 存 游 戏</button>
-      <button class="loadAction" id="doLoadBtn" ${data ? '' : 'disabled'}>读 取 存 档</button>
-    </div>
-  `;
-  panel.appendChild(wrap);
-  document.getElementById('doSaveBtn').onclick = () => {
-    const ok = saveGame();
-    if (ok) { showToast('游戏已保存', 1200); renderSaveTab(panel); }
-    else showToast('保存失败', 1200);
-  };
-  document.getElementById('doLoadBtn').onclick = () => {
-    if (!data) return;
-    const confirmLoad = confirm('读取存档会覆盖当前进度，确定吗？');
-    if (!confirmLoad) return;
-    restoreFromSave(data);
-    document.getElementById('campScreen').style.display = 'none';
-    if (mode !== STATE.MAP) {
-      G.battle = null;
-      G.anim = null;
-      mode = STATE.MAP;
-      hideCmdMenu(); hideUnitInfo(); hideHint();
-      document.getElementById('btnEndTurn').style.display = 'none';
-      document.getElementById('btnBack').style.display = 'none';
-      document.getElementById('infoLeft').textContent = '大地图';
+
+  let html = '';
+  for (let slot = 1; slot <= 5; slot++) {
+    const data = loadSaveData(slot);
+    let infoHtml = '';
+    if (data) {
+      const d = new Date(data.savedAt);
+      const timeStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      infoHtml = `
+        <div><span class="label">阵营：</span><span class="value">${data.playerFaction || '未知'}</span></div>
+        <div><span class="label">金币：</span><span class="value">${data.gold || 0}</span></div>
+        <div><span class="label">天数：</span><span class="value">第 ${data.day || 1} 天</span></div>
+        <div><span class="label">武将：</span><span class="value">${(data.playerHeroes || []).length} 人</span></div>
+        <div><span class="label">存档时间：</span><span class="value">${timeStr}</span></div>
+      `;
+    } else {
+      infoHtml = '<div class="empty">空 槽 位</div>';
     }
-    document.getElementById('campBtn').style.display = 'block';
-    showToast('已读取存档', 1200);
-    log('已读取存档。');
-  };
+    html += `
+      <div class="saveInfo" style="margin-bottom:12px;">
+        <div style="font-size:15px;color:#ffdd55;letter-spacing:3px;margin-bottom:8px;">存 档 ${slot}</div>
+        ${infoHtml}
+        <div class="saveActions" style="margin-top:12px;">
+          <button class="saveAction" data-save="${slot}">保 存 到 此 槽</button>
+          <button class="loadAction" data-load="${slot}" ${data ? '' : 'disabled'}>读 取 此 槽</button>
+        </div>
+      </div>
+    `;
+  }
+  wrap.innerHTML = html;
+  panel.appendChild(wrap);
+
+  // ★ 保存
+  panel.querySelectorAll('button[data-save]').forEach(btn => {
+    btn.onclick = () => {
+      const slot = parseInt(btn.dataset.save);
+      const data = loadSaveData(slot);
+      if (data && !confirm(`存档 ${slot} 已有数据，覆盖吗？`)) return;
+      const ok = saveGame(slot);
+      if (ok) { showToast('已保存到存档 ' + slot, 1200); renderSaveTab(panel); }
+      else showToast('保存失败', 1200);
+    };
+  });
+
+  // ★ 读取
+  panel.querySelectorAll('button[data-load]').forEach(btn => {
+    btn.onclick = () => {
+      const slot = parseInt(btn.dataset.load);
+      const data = loadSaveData(slot);
+      if (!data) return;
+      if (!confirm('读取存档会覆盖当前进度，确定吗？')) return;
+      restoreFromSave(data);
+      document.getElementById('campScreen').style.display = 'none';
+      if (mode !== STATE.MAP) {
+        G.battle = null;
+        G.anim = null;
+        mode = STATE.MAP;
+        hideCmdMenu(); hideUnitInfo(); hideHint();
+        document.getElementById('btnEndTurn').style.display = 'none';
+        document.getElementById('btnBack').style.display = 'none';
+        document.getElementById('infoLeft').textContent = '大地图';
+      }
+      document.getElementById('campBtn').style.display = 'block';
+      showToast('已读取存档 ' + slot, 1200);
+      log('已读取存档 ' + slot + '。');
+    };
+  });
 }
+/* ======================== 武将装备界面 ======================== */
+
+let currentEquipHeroIdx = -1;
+
+function openEquipScreen(heroIdx) {
+  if (heroIdx < 0 || heroIdx >= G.playerHeroes.length) return;
+  currentEquipHeroIdx = heroIdx;
+  renderEquipScreen();
+  document.getElementById('equipScreen').style.display = 'flex';
+}
+
+function closeEquipScreen() {
+  document.getElementById('equipScreen').style.display = 'none';
+  currentEquipHeroIdx = -1;
+  // ★ 关闭装备界面时，如果营地在武将标签，重新渲染一遍
+  if (currentCampTab === 'heroes') {
+    const panel = document.getElementById('campPanel');
+    panel.innerHTML = '';
+    renderHeroesTab(panel);
+  }
+}
+
+function renderEquipScreen() {
+  const h = G.playerHeroes[currentEquipHeroIdx];
+  if (!h) return;
+  const s = calcHeroStats(h);
+  const color = RANK_COLOR[s.rank];
+  document.getElementById('equipHeroName').innerHTML =
+    `<span style="color:${color}">${h.isHistorical ? '★' : ''}${h.heroName}</span> <span style="color:#8a7a5a;font-size:14px;">【${s.rank}】${h.cls}</span>`;
+
+  // 三个部位
+  const slotsEl = document.getElementById('equipSlots');
+  slotsEl.innerHTML = '';
+  for (const part of ['武器', '防具', '坐骑']) {
+    const eq = h.equips ? h.equips[part] : null;
+    const icon = EQUIP_PARTS[part] ? EQUIP_PARTS[part].icon : '?';
+    const slot = document.createElement('div');
+    slot.className = 'equipSlot' + (eq ? '' : ' empty');
+    if (eq) {
+      slot.style.borderColor = eq.color;
+      let statHtml = '';
+      if (eq.atk) statHtml += `攻 +${eq.atk}　`;
+      if (eq.def) statHtml += `防 +${eq.def}　`;
+      if (eq.hp) statHtml += `HP +${eq.hp}　`;
+      if (eq.mov) statHtml += `移动 +${eq.mov}　`;
+      if (eq.dodge) statHtml += `闪避 +${Math.round(eq.dodge * 100)}%`;
+      const specialHtml = eq.special
+        ? `<div class="slotSpecial">【${eq.special.name}】${eq.special.desc}</div>`
+        : '';
+      slot.innerHTML = `
+        <div class="slotIcon">${icon}</div>
+        <div class="slotInfo">
+          <div class="slotName" style="color:${eq.color}">${eq.name}</div>
+          <div class="slotPart">【${eq.rank}】${part}</div>
+          <div class="slotStat">${statHtml}</div>
+          ${specialHtml}
+        </div>
+        <button class="unequipBtn" data-unequip="${part}">卸 下</button>
+      `;
+    } else {
+      slot.innerHTML = `
+        <div class="slotIcon">${icon}</div>
+        <div class="slotInfo">
+          <div class="slotName" style="color:#8a7a5a;">（空）</div>
+          <div class="slotPart">${part}</div>
+        </div>
+      `;
+    }
+    slotsEl.appendChild(slot);
+  }
+
+  // 卸下按钮
+  slotsEl.querySelectorAll('button[data-unequip]').forEach(btn => {
+    btn.onclick = () => {
+      const part = btn.dataset.unequip;
+      const eq = h.equips[part];
+      if (!eq) return;
+      G.equipments.push(eq);
+      h.equips[part] = null;
+      log(heroPlainName(h) + ' 卸下了 ' + eq.name);
+      renderEquipScreen();
+    };
+  });
+
+  // 可装备列表（包裹里该部位的装备）
+  const availEl = document.getElementById('equipAvailList');
+  availEl.innerHTML = '';
+  const available = G.equipments.filter(eq => eq.part === '武器' || eq.part === '防具' || eq.part === '坐骑');
+  if (!available.length) {
+    availEl.innerHTML = '<div class="equipAvailEmpty">🎒<br>包裹里没有装备<br>（战斗掉落或商店购买）</div>';
+  } else {
+    for (let i = 0; i < G.equipments.length; i++) {
+      const eq = G.equipments[i];
+      const icon = EQUIP_PARTS[eq.part] ? EQUIP_PARTS[eq.part].icon : '?';
+      let statHtml = '';
+      if (eq.atk) statHtml += `攻 +${eq.atk}　`;
+      if (eq.def) statHtml += `防 +${eq.def}　`;
+      if (eq.hp) statHtml += `HP +${eq.hp}　`;
+      if (eq.mov) statHtml += `移动 +${eq.mov}　`;
+      if (eq.dodge) statHtml += `闪避 +${Math.round(eq.dodge * 100)}%`;
+      const specialHtml = eq.special
+        ? `<div class="special">【${eq.special.name}】</div>`
+        : '';
+      const card = document.createElement('div');
+      card.className = 'equipAvailCard';
+      card.style.borderColor = eq.color;
+      card.innerHTML = `
+        <div class="icon">${icon}</div>
+        <div class="info">
+          <div class="name" style="color:${eq.color}">${eq.name}</div>
+          <div class="cls">【${eq.rank}】${eq.part}</div>
+          <div class="stat">${statHtml}</div>
+          ${specialHtml}
+        </div>
+      `;
+      card.onclick = () => {
+        equipFromBag(i);
+      };
+      availEl.appendChild(card);
+    }
+  }
+}
+
+/* 从包裹里把装备装到武将身上 */
+function equipFromBag(bagIdx) {
+  const h = G.playerHeroes[currentEquipHeroIdx];
+  if (!h) return;
+  const eq = G.equipments[bagIdx];
+  if (!eq) return;
+  const part = eq.part;
+  if (part !== '武器' && part !== '防具' && part !== '坐骑') return;
+  // 如果该部位已有装备，退回包裹
+  if (h.equips[part]) {
+    G.equipments.push(h.equips[part]);
+  }
+  // 从包裹移除
+  G.equipments.splice(bagIdx, 1);
+  // 装上
+  h.equips[part] = eq;
+  log(heroPlainName(h) + ' 装备了 ' + eq.name);
+  renderEquipScreen();
+}
+
+document.getElementById('equipClose').onclick = closeEquipScreen;
 
 document.getElementById('campBtn').onclick = openCamp;
 document.getElementById('campClose').onclick = closeCamp;
@@ -3676,6 +5117,7 @@ function serializeHero(h) {
     growth: h.growth,
     trait: h.trait || null,
     forcedRank: h.forcedRank || null,
+    equips: h.equips || { '武器': null, '防具': null, '坐骑': null },
   };
 }
 function deserializeHero(o) {
@@ -3692,6 +5134,7 @@ function deserializeHero(o) {
     growth: o.growth || RANK_GROWTH['名将'],
     trait: o.trait || null,
     forcedRank: o.forcedRank || null,
+    equips: o.equips || { '武器': null, '防具': null, '坐骑': null },
   };
 }
 function serializeEnemy(e) {
@@ -3713,10 +5156,11 @@ function serializeEnemy(e) {
 function deserializeEnemy(o) {
   return Object.assign({}, o, { vx: 0, vy: 0, speed: 0, r: 16 });
 }
-
-function saveGame() {
+function slotKey(n) { return 'sanguo_save_v' + n; }
+function saveGame(slot) {
+  slot = slot || 1;
   const data = {
-    version: 3, savedAt: Date.now(),
+    version: 4, savedAt: Date.now(),
     playerFaction: G.playerFaction,
     playerHeroes: G.playerHeroes.map(serializeHero),
     formation: G.formation,
@@ -3724,20 +5168,25 @@ function saveGame() {
     usedHeroes: Array.from(G.usedHeroes.entries()),
     day: G.day, moveSteps: G.moveSteps, lastSpawnStep: G.lastSpawnStep,
     gold: G.gold,
+    equipments: G.equipments,
     player: {
       x: G.player.x, y: G.player.y,
       gridCol: G.player.gridCol, gridRow: G.player.gridRow,
     },
     enemies: G.enemies.map(serializeEnemy),
+    factionRelations: G.factionRelations,
+    dungeons: G.dungeons,
+    lastDungeonRespawn: G.lastDungeonRespawn,
   };
   try {
-    localStorage.setItem('sanguo_save_v1', JSON.stringify(data));
+    localStorage.setItem(slotKey(slot), JSON.stringify(data));
     return true;
   } catch (e) { console.warn('保存失败:', e); return false; }
 }
-function loadSaveData() {
+function loadSaveData(slot) {
+  slot = slot || 1;
   try {
-    const s = localStorage.getItem('sanguo_save_v1');
+    const s = localStorage.getItem(slotKey(slot));
     if (!s) return null;
     return JSON.parse(s);
   } catch (e) { return null; }
@@ -3752,6 +5201,11 @@ function restoreFromSave(data) {
   G.moveSteps = data.moveSteps || 0;
   G.lastSpawnStep = data.lastSpawnStep || 0;
   G.gold = data.gold || 100;
+  G.factionRelations = data.factionRelations || {};
+  G.dungeons = data.dungeons || [];
+  G.lastDungeonRespawn = data.lastDungeonRespawn || 0;
+  
+  G.equipments = data.equipments || [];
   generateTerrain();
   initCities();
   G.player.x = data.player.x;
@@ -3774,9 +5228,10 @@ function loop(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;
   if (mode === STATE.MAP) {
-    updateMap(dt);
+        updateMap(dt);
     drawMap();
-    document.getElementById('infoRight').textContent = '日：' + G.day;
+    G.day = Math.floor(G.moveSteps / 100) + 1;
+    document.getElementById('infoRight').textContent = '第 ' + G.day + ' 天';
   } else if (mode === STATE.BATTLE) {
     drawBattle();
   } else if (mode === STATE.ANIM) {
@@ -3826,6 +5281,234 @@ canvas.addEventListener('pointerdown', e => {
     battleClick(p.x, p.y);
   }
 });
+/* ======================== 相遇弹窗 ======================== */
+
+const encounterScreen = document.getElementById('encounterScreen');
+
+function showEncounterDialog(enemy) {
+  G.pendingEncounter = enemy;
+  const rel = G.factionRelations[enemy.faction] !== undefined ? G.factionRelations[enemy.faction] : 0;
+  const status = relationStatus(rel);
+  const color = relationColor(rel);
+
+  // ★ 攻击后的关系变化提示
+  let delta = 0;
+  let hint = '';
+  if (status === '盟友') { delta = -50; hint = '攻击将大幅降低关系（-50）'; }
+  else if (status === '友好') { delta = -30; hint = '攻击将降低关系（-30）'; }
+  else if (status === '中立') { delta = -10; hint = '攻击将略微降低关系（-10）'; }
+  else { hint = '攻击不会进一步降低关系'; }
+
+  document.getElementById('encounterInfo').innerHTML = `
+    <div><span class="label">阵营：</span><span class="value">${enemy.faction}</span></div>
+    <div><span class="label">主将：</span><span class="value">${enemy.isHistorical ? '★' : ''}${enemy.heroName}</span></div>
+    <div><span class="label">兵力：</span><span class="value">${enemy.enemyCount || 3} 人</span></div>
+    <div><span class="label">关系：</span><span style="color:${color}">${rel}（${status}）</span></div>
+    <div style="color:#ffaa2a;font-size:12px;margin-top:6px;border-top:1px dashed #6b5333;padding-top:6px;">${hint}</div>
+  `;
+  encounterScreen.style.display = 'flex';
+  G.player.moving = false;
+  G.player.path = [];
+}
+
+document.getElementById('encounterAtk').onclick = () => {
+  const e = G.pendingEncounter;
+  encounterScreen.style.display = 'none';
+  G.pendingEncounter = null;
+  if (!e) return;
+  const rel = G.factionRelations[e.faction] !== undefined ? G.factionRelations[e.faction] : 0;
+  const status = relationStatus(rel);
+  let delta = 0;
+  if (status === '盟友') delta = -50;
+  else if (status === '友好') delta = -30;
+  else if (status === '中立') delta = -10;
+  if (delta !== 0) {
+    changeRelation(e.faction, delta);
+    log('攻击了 ' + e.faction + '，关系 ' + delta);
+  }
+  startBattle(e);
+};
+
+document.getElementById('encounterPass').onclick = () => {
+  const e = G.pendingEncounter;
+  encounterScreen.style.display = 'none';
+  G.pendingEncounter = null;
+  if (!e) return;
+  const p = G.player;
+  const dx = p.x - e.x, dy = p.y - e.y;
+  const d = Math.hypot(dx, dy) || 1;
+  p.x += dx / d * 100;
+  p.y += dy / d * 100;
+  p.tx = p.x; p.ty = p.y;
+  p.moving = false;
+  p.invuln = 2;
+  log('绕过了 ' + e.faction + ' 部队。');
+};
+
+/* ======================== 副本交互 ======================== */
+
+const dungeonEntryScreen = document.getElementById('dungeonEntryScreen');
+const dungeonLayerScreen = document.getElementById('dungeonLayerScreen');
+
+function showDungeonEntryDialog(dungeon) {
+  G.pendingDungeon = dungeon;
+  const t = DUNGEON_TYPES[dungeon.type];
+  document.getElementById('dungeonEntryTitle').textContent = t.icon + ' ' + dungeon.type;
+  document.getElementById('dungeonEntryInfo').innerHTML = `
+    <div><span class="label">层数：</span><span class="value">${dungeon.layers} 层</span></div>
+    <div><span class="label">描述：</span><span class="value">${dungeon.desc}</span></div>
+  `;
+  document.getElementById('dungeonEntryScreen').style.setProperty('display', 'flex', 'important');
+  G.player.moving = false;
+  G.player.path = [];
+}
+
+document.getElementById('dungeonEnter').onclick = () => {
+  document.getElementById('dungeonEntryScreen').style.setProperty('display', 'none', 'important');
+  const d = G.pendingDungeon;
+  G.pendingDungeon = null;
+  G.dungeonCooldown = 5;   // ★ 加冷却
+  if (!d) return;
+  startDungeonLayer(d, 1);
+};
+
+document.getElementById('dungeonCancel').onclick = () => {
+  document.getElementById('dungeonEntryScreen').style.setProperty('display', 'none', 'important');
+  G.pendingDungeon = null;
+  G.currentDungeon = null;
+  G.dungeonCooldown = 5;   // ★ 5 秒内不再触发
+  G.player.invuln = 1.5;
+};
+
+function startDungeonLayer(dungeon, layer) {
+  const enemy = generateDungeonEnemies(dungeon, layer);
+  enemy.dungeon = dungeon;
+  enemy.layer = layer;
+  enemy.isDungeon = true;
+  G.currentDungeon = dungeon;
+  G.currentDungeonLayer = layer;
+  startBattle(enemy);
+}
+
+function showDungeonLayerDialog(dungeon, layer) {
+  const t = DUNGEON_TYPES[dungeon.type];
+  const isLast = layer >= dungeon.layers;
+  document.getElementById('dungeonLayerTitle').textContent =
+    t.icon + ' ' + dungeon.type + ' · 第 ' + layer + ' 层';
+  document.getElementById('dungeonLayerInfo').innerHTML = `
+    <div><span class="label">状态：</span><span class="value" style="color:#4caf50;">通关</span></div>
+    <div><span class="label">当前层：</span><span class="value">${layer} / ${dungeon.layers}</span></div>
+    ${isLast ? '<div style="color:#ffdd55;margin-top:8px;">这是最后一层，副本已完成。</div>' : ''}
+  `;
+  document.getElementById('dungeonLayerScreen').style.setProperty('display', 'flex', 'important');
+  document.getElementById('dungeonNext').style.display = isLast ? 'none' : 'inline-block';
+}
+
+document.getElementById('dungeonNext').onclick = () => {
+  document.getElementById('dungeonLayerScreen').style.setProperty('display', 'none', 'important');
+  const d = G.currentDungeon;
+  if (!d) return;
+  startDungeonLayer(d, (G.currentDungeonLayer || 1) + 1);
+};
+
+document.getElementById('dungeonRetreat').onclick = () => {
+  document.getElementById('dungeonLayerScreen').style.setProperty('display', 'none', 'important');
+  const d = G.currentDungeon;
+  const layer = G.currentDungeonLayer || 1;
+  G.currentDungeon = null;
+  G.currentDungeonLayer = 0;
+
+  if (d) {
+    if (layer >= d.layers) {
+      // ★ 打到最深层 → 副本完成，移除 + 冷却
+      const idx = G.dungeons.indexOf(d);
+      if (idx >= 0) G.dungeons.splice(idx, 1);
+      G.lastDungeonRespawn = G.moveSteps;
+      log('🎉 ' + d.type + ' 已通关！副本消失，等待新副本刷新。');
+      // 顺便尝试补一个副本
+      setTimeout(() => {
+        if (G.dungeons.length < DUNGEON_MAX - 1) respawnDungeon();
+      }, 100);
+    } else {
+      log('从 ' + d.type + ' 撤退，副本保留。');
+    }
+  }
+  G.player.invuln = 2;
+  mode = STATE.MAP;
+};
+
+/* ======================== 通关判定 ======================== */
+
+function checkVictory() {
+  const myFaction = G.playerFaction;
+  if (!myFaction) return false;
+  const otherFactions = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉'].filter(f => f !== myFaction);
+  for (const f of otherFactions) {
+    const hasCity = G.cities.some(c => c.faction === f);
+    if (hasCity) return false;
+  }
+  showVictoryScreen();
+  return true;
+}
+
+function showVictoryScreen() {
+  document.getElementById('victorySubtitle').textContent = '【' + G.playerFaction + '】统一了天下';
+  document.getElementById('victoryStats').innerHTML = `
+    <div><span class="label">用时：</span>${G.day} 天（${G.moveSteps} 步）</div>
+    <div><span class="label">麾下武将：</span>${G.playerHeroes.length} 人</div>
+    <div><span class="label">累计金币：</span>${G.gold}</div>
+  `;
+  document.getElementById('victoryScreen').style.display = 'flex';
+  G.gameWon = true;
+}
+
+document.getElementById('victoryOk').onclick = () => {
+  location.reload();
+};
+
+/* ======================== 外交标签 ======================== */
+
+function renderDiplomacyTab(panel) {
+  const wrap = document.createElement('div');
+  wrap.style.maxWidth = '700px';
+  wrap.style.margin = '0 auto';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:14px;color:#c9a96a;letter-spacing:2px;margin-bottom:16px;';
+  title.textContent = '阵 营 关 系';
+  wrap.appendChild(title);
+
+  const factions = ['魏', '蜀', '吴', '黄巾', '荆州', '益州', '西凉'];
+  for (const f of factions) {
+    const rel = G.factionRelations[f] !== undefined ? G.factionRelations[f] : 0;
+    const status = relationStatus(rel);
+    const color = relationColor(rel);
+    const isSelf = (f === G.playerFaction);
+    const row = document.createElement('div');
+    row.style.cssText = `
+      display:flex; align-items:center; gap:14px;
+      padding:12px 16px; margin-bottom:8px;
+      background:rgba(40,28,14,.9);
+      border:1px solid ${isSelf ? '#c9a96a' : '#6b5333'};
+      border-radius:8px;
+    `;
+    row.innerHTML = `
+      <div style="font-size:18px;color:#ffdd55;width:60px;">${f}</div>
+      <div style="flex:1;">
+        <div style="background:#1a1208;height:12px;border-radius:6px;overflow:hidden;position:relative;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${(rel + 100) / 2}%;background:${color};"></div>
+          <div style="position:absolute;left:50%;top:0;width:1px;height:100%;background:#6b5333;"></div>
+        </div>
+      </div>
+      <div style="color:${color};font-size:14px;width:100px;text-align:right;">
+        ${isSelf ? '自己' : status} ${rel}
+      </div>
+    `;
+    wrap.appendChild(row);
+  }
+
+  panel.appendChild(wrap);
+}
 
 document.getElementById('btnEndTurn').onclick = () => {
   if (mode === STATE.BATTLE && !G.anim && G.battle && G.battle.phase === PHASE.SELECT) {
